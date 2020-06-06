@@ -16,10 +16,6 @@ inputs:
     description: "'job' workflow context"
     required: false
     default: ${{ toJson(job) }}
-  steps:
-    description: "'steps' workflow context"
-    required: false
-    default: ${{ toJson(steps) }}
   runner:
     description: "'runner' workflow context"
     required: false
@@ -32,10 +28,6 @@ inputs:
     description: "'matrix' workflow context"
     required: false
     default: ${{ toJson(matrix) }}
-  needs:
-    description: "'needs' workflow context"
-    required: false
-    default: ${{ toJson(needs) }}
 outputs:
   result:
     description: Return value of script execution

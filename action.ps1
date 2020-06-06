@@ -9,11 +9,9 @@ function CreateContext($name) {
 
 CreateContext github
 CreateContext job
-CreateContext steps
 CreateContext runner
 CreateContext strategy
 CreateContext matrix
-CreateContext needs
 
 Remove-Item Function:CreateContext
 

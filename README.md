@@ -8,11 +8,9 @@ the body of a PowerShell script.
 The following is initialized before your script is executed:
 - `$github` is an object representing the workflow's [`github` context]
 - `$job` is an object representing the workflow's [`job` context]
-- `$steps` is an object representing the workflow's [`steps` context]
 - `$runner` is an object representing the workflow's [`runner` context]
 - `$strategy` is an object representing the workflow's [`strategy` context]
 - `$matrix` is an object representing the workflow's [`matrix` context]
-- `$needs` is an object representing the workflow's [`needs` context]
 
 Environment variables are accessed in the standard PowerShell way (`$env:my_var`).
 
@@ -55,8 +53,6 @@ TODO
 [`@actions/core`]: https://github.com/actions/toolkit/tree/master/packages/core
 [`github` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#github-context
 [`job` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#job-context
-[`steps` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#steps-context
 [`runner` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#runner-context
 [`strategy` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#strategy-context
 [`matrix` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#matrix-context
-[`needs` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#needs-context
