@@ -1,0 +1,20 @@
+{
+  "name": "pwsh-script",
+  "version": "1.0.0",
+  "description": "GitHub Action to run PowerShell scripts in a rich, prepared scope - inspired by actions/github-script.",
+  "main": "invoke-pwsh.js",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Amadevus/pwsh-script.git"
+  },
+  "author": "Amadeusz Sadowski",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Amadevus/pwsh-script/issues"
+  },
+  "homepage": "https://github.com/Amadevus/pwsh-script#readme",
+  "dependencies": {
+    "@actions/exec": "^1.0.4"
+  }
+}

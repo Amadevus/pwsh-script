@@ -1,0 +1,43 @@
+name: PowerShell script
+author: Amadevus
+description: >
+  Run PowerShell scripts within a hydrated context,
+  with @actions/core functions ported as cmdlets;
+  inspired heavily by actions/github-script.
+inputs:
+  script:
+    description: PowerShell script to execute in Actions-hydrated context
+    required: true
+  github:
+    description: "'github' workflow context"
+    required: false
+    default: ${{ toJson(github) }}
+  job:
+    description: "'job' workflow context"
+    required: false
+    default: ${{ toJson(job) }}
+  steps:
+    description: "'steps' workflow context"
+    required: false
+    default: ${{ toJson(steps) }}
+  runner:
+    description: "'runner' workflow context"
+    required: false
+    default: ${{ toJson(runner) }}
+  strategy:
+    description: "'strategy' workflow context"
+    required: false
+    default: ${{ toJson(strategy) }}
+  matrix:
+    description: "'matrix' workflow context"
+    required: false
+    default: ${{ toJson(matrix) }}
+outputs:
+  result:
+    description: Return value of script execution
+runs:
+  using: node12
+  main: dist/index.js
+branding:
+  icon: terminal
+  color: blue
