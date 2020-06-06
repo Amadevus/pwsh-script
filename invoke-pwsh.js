@@ -11,7 +11,7 @@ async function run() {
         cwd: process.cwd(),
         stdio: 'inherit',
     })
-    if (result.status instanceof 'number') {
+    if (typeof result.status === 'number') {
         process.exitCode = result.status
     }
 }
