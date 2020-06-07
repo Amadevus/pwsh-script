@@ -573,7 +573,7 @@ function ConvertTo-ActionCommandValue {
     if ($Value -is [string]) {
         return $Value
     }
-    return ConvertTo-Json $Value -Depth 1024 -Compress -EscapeHandling EscapeNonAscii
+    return ConvertTo-Json $Value -Depth 100 -Compress -EscapeHandling EscapeNonAscii
 }
 
 ## Escaping based on https://github.com/actions/toolkit/blob/3e40dd39cc56303a2451f5b175068dbefdc11c18/packages/core/src/command.ts#L92-L105
