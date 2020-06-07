@@ -31,7 +31,7 @@ The return value of the script will be made available in the step's outputs unde
 ## Result encoding
 
 If the script return value is a single string, it'll be set as the value of the `result` output directly.
-In any other case, it'll be passed to `ConvertTo-Json $Value -Depth [int]::MaxValue -Compress -EscapeHandling EscapeNonAscii`
+In any other case, it'll be passed to `ConvertTo-Json $Value -Depth 1024 -Compress -EscapeHandling EscapeNonAscii`
 and the string result of that call will be set as the output value.
 
 ## Actions cmdlets
