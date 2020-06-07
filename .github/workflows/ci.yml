@@ -10,7 +10,7 @@ jobs:
         run: |
           $env:INPUT_SCRIPT = 'echo "ok"; return "value"'
           $output = node ./dist/index.js
-          if ($LASTEXITCODE -ne 0) throw 'node failed';
+          if ($LASTEXITCODE -ne 0) { throw 'node failed' }
           $diff = Compare-Object @('ok','::set-output name=result::value') $output -CaseSensitive
           if ($diff) {
             Write-Host $diff
