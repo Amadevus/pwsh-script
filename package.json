@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "GitHub Action to run PowerShell scripts in a rich, prepared scope - inspired by actions/github-script.",
   "main": "invoke-pwsh.js",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Amadevus/pwsh-script.git"
