@@ -78,7 +78,7 @@ NOTES
     
 RELATED LINKS
     https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
-    https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+    https://github.com/actions/toolkit/tree/master/packages/core#logging
 
 ```
 

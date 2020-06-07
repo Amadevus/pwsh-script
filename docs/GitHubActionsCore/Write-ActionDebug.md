@@ -39,7 +39,7 @@ OUTPUTS
     
 RELATED LINKS
     https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-debug-message
-    https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+    https://github.com/actions/toolkit/tree/master/packages/core#logging
 
 ```
 

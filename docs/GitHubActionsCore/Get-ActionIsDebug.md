@@ -31,8 +31,8 @@ OUTPUTS
     
     
 RELATED LINKS
-    https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
-    https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+    https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
+    https://github.com/actions/toolkit/tree/master/packages/core#logging
 
 ```
 

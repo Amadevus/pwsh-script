@@ -54,7 +54,7 @@ The value of the secret.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#setting-a-secret
 #>
 function Add-ActionSecret {
     param(
@@ -76,7 +76,7 @@ Do not prepend path to current action's/step's environment PATH.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#adding-a-system-path
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#path-manipulation
 #>
 function Add-ActionPath {
     param(
@@ -113,7 +113,7 @@ Whether the input is required. If required and not present, will throw.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
 #>
 function Get-ActionInput {
     [OutputType([string])]
@@ -143,7 +143,7 @@ Value to store. Non-string values will be converted to a string via ConvertTo-Js
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
 #>
 function Set-ActionOutput {
     param(
@@ -170,8 +170,6 @@ Equivalent of `core.setCommandEcho(enabled)`.
 $true to enable echoing, $false to disable.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
-.LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
 #>#
 function Set-ActionCommandEcho {
     param(
@@ -192,7 +190,7 @@ Add issue message.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#exit-codes
 #>
 function Set-ActionFailed {
     param(
@@ -207,9 +205,9 @@ function Set-ActionFailed {
 Gets whether Actions Step Debug is on or not.
 Equivalent of `core.isDebug()`.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#logging
 #>
 function Get-ActionIsDebug {
     [OutputType([bool])]
@@ -226,7 +224,7 @@ Debug message.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-debug-message
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Write-ActionDebug {
     param(
@@ -255,7 +253,7 @@ but not available in `@actions/core` package.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Write-ActionError {
     param(
@@ -305,7 +303,7 @@ but not available in `@actions/core` package.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Write-ActionWarning {
     param(
@@ -347,7 +345,7 @@ Info message.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Write-ActionInfo {
     param(
@@ -370,7 +368,7 @@ The name of the output group.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Enter-ActionOutputGroup {
     param(
@@ -388,7 +386,7 @@ Equivalent of `core.endGroup()`.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Exit-ActionOutputGroup {
     Send-ActionCommand endgroup
@@ -405,7 +403,7 @@ Script block to execute in between opening and closing output group.
 .LINK
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/master/packages/core#logging
 #>
 function Invoke-ActionGroup {
     param(
