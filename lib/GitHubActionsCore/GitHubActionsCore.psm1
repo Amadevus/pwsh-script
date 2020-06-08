@@ -212,7 +212,7 @@ https://github.com/actions/toolkit/tree/master/packages/core#logging
 function Get-ActionIsDebug {
     [OutputType([bool])]
     param()
-    return (Get-Item Env:RUNNER_DEBUG -ErrorAction SilentlyContinue) -eq '1'
+    return '1' -eq (Get-Item Env:RUNNER_DEBUG -ErrorAction SilentlyContinue).Value
 }
 
 <#
