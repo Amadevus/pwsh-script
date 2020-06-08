@@ -306,7 +306,7 @@ Describe 'Send-ActionCommand' {
     ) {
         {
             Send-ActionCommand -Command $Value
-        } | Should -Throw "Cannot bind argument to parameter 'Command'*"
+        } | Should -Throw "Cannot validate argument on parameter 'Command'. The argument is null or empty.*"
     }
     It "Given a command with message '<msg>' writes '<expected>' to host" -TestCases @(
         @{ Msg = $null; Expected = '::test-cmd::' }

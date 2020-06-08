@@ -22,15 +22,18 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
 #>
 function Set-ActionVariable {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Name,
+
         [Parameter(Position = 1, Mandatory)]
         [AllowNull()]
         [AllowEmptyString()]
         [AllowEmptyCollection()]
         [object]$Value,
-        [Parameter()]
+        
         [switch]$SkipLocal
     )
     $convertedValue = ConvertTo-ActionCommandValue $Value
@@ -57,8 +60,10 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#setting-a-secret
 #>
 function Add-ActionSecret {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Secret
     )
 
@@ -79,10 +84,12 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#path-manipulation
 #>
 function Add-ActionPath {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Path,
-        [Parameter()]
+        
         [switch]$SkipLocal
     )
 
@@ -116,10 +123,13 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
 #>
 function Get-ActionInput {
+    [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Position = 0, Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Name,
+
         [switch]$Required
     )
     
@@ -146,9 +156,12 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
 #>
 function Set-ActionOutput {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Name,
+
         [Parameter(Position = 1, Mandatory)]
         [AllowNull()]
         [AllowEmptyString()]
@@ -172,6 +185,7 @@ $true to enable echoing, $false to disable.
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
 #>#
 function Set-ActionCommandEcho {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory, Position = 0)]
         [bool]$Enabled
@@ -193,7 +207,9 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#exit-codes
 #>
 function Set-ActionFailed {
+    [CmdletBinding()]
     param(
+        [Parameter(Position = 0)]
         [string]$Message = ""
     )
     [System.Environment]::ExitCode = 1
@@ -210,6 +226,7 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#logging
 #>
 function Get-ActionIsDebug {
+    [CmdletBinding()]
     [OutputType([bool])]
     param()
     return '1' -eq (Get-Item Env:RUNNER_DEBUG -ErrorAction SilentlyContinue).Value
@@ -227,6 +244,7 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Write-ActionDebug {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
         [string]$Message = ""
@@ -256,24 +274,28 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Write-ActionError {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, ParameterSetName = 'MsgOnly')]
         [Parameter(Position = 0, ParameterSetName = 'File')]
         [Parameter(Position = 0, ParameterSetName = 'Line')]
         [Parameter(Position = 0, ParameterSetName = 'Column')]
         [string]$Message = "",
+
         [Parameter(Position = 1, ParameterSetName = 'File', Mandatory)]
         [Parameter(Position = 1, ParameterSetName = 'Line', Mandatory)]
         [Parameter(Position = 1, ParameterSetName = 'Column', Mandatory)]
         [string]$File,
+
         [Parameter(Position = 2, ParameterSetName = 'Line', Mandatory)]
         [Parameter(Position = 2, ParameterSetName = 'Column', Mandatory)]
         [int]$Line,
+
         [Parameter(Position = 3, ParameterSetName = 'Column', Mandatory)]
         [int]$Column
     )
-    $params = [ordered]@{}
-    if ($PSCmdlet.ParameterSetName -in 'Column', 'Line', 'File') {
+    $params = [ordered]@{ }
+    if ($File) {
         $params['file'] = $File
     }
     if ($PSCmdlet.ParameterSetName -in 'Column', 'Line') {
@@ -306,24 +328,28 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Write-ActionWarning {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, ParameterSetName = 'MsgOnly')]
         [Parameter(Position = 0, ParameterSetName = 'File')]
         [Parameter(Position = 0, ParameterSetName = 'Line')]
         [Parameter(Position = 0, ParameterSetName = 'Column')]
         [string]$Message = "",
+
         [Parameter(Position = 1, ParameterSetName = 'File', Mandatory)]
         [Parameter(Position = 1, ParameterSetName = 'Line', Mandatory)]
         [Parameter(Position = 1, ParameterSetName = 'Column', Mandatory)]
         [string]$File,
+
         [Parameter(Position = 2, ParameterSetName = 'Line', Mandatory)]
         [Parameter(Position = 2, ParameterSetName = 'Column', Mandatory)]
         [int]$Line,
+
         [Parameter(Position = 3, ParameterSetName = 'Column', Mandatory)]
         [int]$Column
     )
-    $params = [ordered]@{}
-    if ($PSCmdlet.ParameterSetName -in 'Column', 'Line', 'File') {
+    $params = [ordered]@{ }
+    if ($File) {
         $params['file'] = $File
     }
     if ($PSCmdlet.ParameterSetName -in 'Column', 'Line') {
@@ -348,6 +374,7 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Write-ActionInfo {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
         [string]$Message = ""
@@ -371,8 +398,10 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Enter-ActionOutputGroup {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Name
     )
 
@@ -389,6 +418,8 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#logging
  #>
 function Exit-ActionOutputGroup {
+    [CmdletBinding()]
+    param()
     Send-ActionCommand endgroup
 }
 
@@ -406,9 +437,12 @@ https://help.github.com/en/actions/reference/workflow-commands-for-github-action
 https://github.com/actions/toolkit/tree/master/packages/core#logging
 #>
 function Invoke-ActionGroup {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Name,
+
         [Parameter(Position = 1, Mandatory)]
         [scriptblock]$ScriptBlock
     )
@@ -436,16 +470,20 @@ Use this to automatically generate a GUID and use it as the EndToken.
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#stopping-and-starting-workflow-commands
 #>
 function Invoke-ActionNoCommandsBlock {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, ParameterSetName = 'SetToken', Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$EndToken,
+
         [Parameter(Position = 1, ParameterSetName = 'SetToken', Mandatory)]
         [Parameter(Position = 0, ParameterSetName = 'GenToken', Mandatory)]
         [scriptblock]$ScriptBlock,
+
         [Parameter(ParameterSetName = 'GenToken', Mandatory)]
         [switch]$GenerateToken
     )
-    $tokenValue = $GenerateToken ? [System.Guid]::NewGuid().ToString() : ($EndToken)
+    $tokenValue = $GenerateToken ? [System.Guid]::NewGuid().ToString() : $EndToken
     Send-ActionCommand stop-commands $tokenValue
     try {
         return $ScriptBlock.Invoke()
@@ -478,8 +516,10 @@ PS> Send-ActionCommand set-secret @{name='mypassword'} 'definitelyNotAPassword!'
 https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#about-workflow-commands
 #>
 function Send-ActionCommand {
+    [CmdletBinding()]
     param(
         [Parameter(Position = 0, Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Command,
 
         [Parameter(ParameterSetName = "WithProps", Position = 1, Mandatory)]
@@ -509,6 +549,7 @@ Properties to add to the command.
 Message to add to the command.
 #>
 function ConvertTo-ActionCommandString {
+    [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Position = 0, Mandatory)]
@@ -559,6 +600,7 @@ Equivalent of `core.toCommandValue(input)`.
 Input to sanitize into a string.
 #>
 function ConvertTo-ActionCommandValue {
+    [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory, Position = 0)]
@@ -578,6 +620,7 @@ function ConvertTo-ActionCommandValue {
 
 ## Escaping based on https://github.com/actions/toolkit/blob/3e40dd39cc56303a2451f5b175068dbefdc11c18/packages/core/src/command.ts#L92-L105
 function ConvertTo-ActionEscapedData {
+    [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory, Position = 0)]
@@ -593,6 +636,7 @@ function ConvertTo-ActionEscapedData {
 }
 
 function ConvertTo-ActionEscapedProperty {
+    [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory, Position = 0)]
