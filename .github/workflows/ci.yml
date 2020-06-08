@@ -1,12 +1,19 @@
 name: CI
 on: [push, pull_request]
+defaults:
+  run:
+    shell: pwsh
 jobs:
   build:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+      - name: Test with Pester
+        run: |
+          Install-Module -Name Pester -Force -SkipPublisherCheck -MinimumVersion '5.0'
+          Import-Module Pester -MinimumVersion '5.0'
+          Invoke-Pester -CI
       - name: Invoke action
-        shell: pwsh
         run: |
           $env:INPUT_SCRIPT = 'Write-Host "ok"; return "value"'
           $output = node ./dist/index.js
@@ -16,6 +23,6 @@ jobs:
           }
           $diff = Compare-Object @('ok','::set-output name=result::value') $output -CaseSensitive
           if ($diff) {
-            Write-Host $diff
+            $diff | Format-Table | Write-Host
             throw 'Output differed from the expected'
           }
