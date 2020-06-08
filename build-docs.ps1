@@ -1,10 +1,15 @@
 #!/usr/bin/env pwsh
-
+param([switch]$Clean)
 $cmd = {
     $core = Import-Module ./lib/GitHubActionsCore -PassThru -Scope Local -Force
 
     $docsPath = 'docs/GitHubActionsCore'
-    if (-not (Test-Path $docsPath)) { mkdir $docsPath | Out-Null }
+    if (-not (Test-Path $docsPath)) {
+        mkdir $docsPath | Out-Null
+    }
+    elseif ($Clean) {
+        Remove-Item $docsPath -Force -Recurse
+    }
     Write-Output "| Cmdlet | Synopsis |" > $docsPath/README.md
     Write-Output "|-|-|"                >> $docsPath/README.md
     $core.ExportedCommands.Values | ForEach-Object {
