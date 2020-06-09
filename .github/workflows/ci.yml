@@ -139,13 +139,34 @@ jobs:
             if ($result -ne ($env:RUNNER_DEBUG -eq '1') {
               throw "Get-ActionIsDebug failed.`n$result"
             }
-      # Write-Action -Debug, -Info, -Warning, -Error are not testable in any sensible manner
-      - name: Write-Action... sample runs (manual check)
+
+      - name: Invoke-ActionNoCommandsBlock test (act)
+        uses: ./
+        with:
+          script: |
+            Invoke-ActionNoCommandsBlock {
+              Set-ActionVariable nocmdvar nocmd
+            }
+      - name: Invoke-ActionNoCommandsBlock test (assert)
+        uses: ./
+        with:
+          script: |
+            if ($env:nocmdvar -ne $null) {
+              throw "Invoke-ActionNoCommandsBlock failed.`n$env:nocmdvar"
+            }
+
+      # Write-Action -Debug, -Info, -Warning, -Error and Grouping are not testable in any sensible manner
+      - name: Write-Action... and Group... sample runs (manual check)
         uses: ./
         continue-on-error: true # since we're printing errors
         with:
           script: |
+            Enter-ActionOutputGroup 'testing log levels'
             Write-ActionDebug "dbg msg"
             Write-ActionInfo "info msg"
             Write-ActionWarning "wrn msg"
             Write-ActionError "err msg"
+            Exit-ActionOutputGroup
+            Invoke-ActionGroup "Invoke-ActionGroup group" {
+              Write-Host "output within Invoke-ActionGroup"
+            }
