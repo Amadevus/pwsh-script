@@ -146,7 +146,7 @@ jobs:
         uses: ./
         with:
           script: |
-            Invoke-ActionNoCommandsBlock {
+            Invoke-ActionNoCommandsBlock -GenerateToken {
               Set-ActionVariable nocmdvar nocmd
             }
       - name: Invoke-ActionNoCommandsBlock test (assert)
