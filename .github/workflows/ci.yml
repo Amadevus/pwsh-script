@@ -138,7 +138,7 @@ jobs:
         with:
           script: |
             $result = Get-ActionIsDebug
-            if ($result -ne ($env:RUNNER_DEBUG -eq '1') {
+            if ($result -ne ($env:RUNNER_DEBUG -eq '1')) {
               throw "Get-ActionIsDebug failed.`n$result"
             }
 
