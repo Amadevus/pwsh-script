@@ -84,7 +84,7 @@ Describe 'Set-ActionVariable' {
         @{ Value = ''; ExpectedCmd = ''; ExpectedEnv = $null }
         @{ Value = 'test value'; ExpectedCmd = 'test value'; ExpectedEnv = 'test value' }
         @{ Value = 'A % B'; ExpectedCmd = 'A %25 B'; ExpectedEnv = 'A % B' }
-        @{ Value = [ordered]@{ a = '1x'; b = '2y'}; ExpectedCmd = '{"a":"1x","b":"2y"}'; ExpectedEnv = '{"a":"1x","b":"2y"}' }
+        @{ Value = [ordered]@{ a = '1x'; b = '2y' }; ExpectedCmd = '{"a":"1x","b":"2y"}'; ExpectedEnv = '{"a":"1x","b":"2y"}' }
     ) {
         Set-ActionVariable 'my-var' $Value
 
