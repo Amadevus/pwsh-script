@@ -94,7 +94,8 @@ jobs:
         uses: ./
         with:
           script: |
-            Set-ActionVariable testvar [ordered]@{ a = 1; b = 'c' }
+            $props = [ordered]@{ a = 1; b = 'c' }
+            Set-ActionVariable testvar $props
             if ($env:testvar -ne '{"a":1,"b":"c"}') {
               throw "Set-ActionVariable failed.`n$env:testvar"
             }
