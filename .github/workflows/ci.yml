@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Test Get-ActionInput
+      - name: Get-ActionInput tests
         uses: ./
         with:
           custom-input: 'test'
@@ -49,6 +49,18 @@ jobs:
             if ((Get-ActionInput script) -notlike 'if ((Get-ActionInput script)*') {
               throw "Get-ActionInput for 'script' failed"
             }
-            if ((Get-ActionInput custom-input) -ne 'test') {
+            if ((Get-ActionInput custom-input) -cne 'test') {
               throw "Get-ActionInput for 'custom-input' failed"
+            }
+      - name: Set-ActionOutput test (act)
+        uses: ./
+        id: Set-ActionOutput
+        with:
+          script: Set-ActionOutput test-output 'test-value'
+      - name: Set-ActionOutput test (assert)
+        uses: ./
+        with:
+          script: |
+            if ('${{ steps.Set-ActionOutput.outputs.test-output }}' -cne 'test-value') {
+              throw "Set-ActionOutput failed"
             }
