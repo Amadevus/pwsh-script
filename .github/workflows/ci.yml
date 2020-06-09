@@ -41,10 +41,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Get-ActionInput tests
         uses: ./
         with:
-          custom-input: 'test'
+          custom-input: "test"
           script: |
             if ((Get-ActionInput script) -notlike 'if ((Get-ActionInput script)*') {
               throw "Get-ActionInput for 'script' failed"
@@ -52,6 +53,7 @@ jobs:
             if ((Get-ActionInput custom-input) -cne 'test') {
               throw "Get-ActionInput for 'custom-input' failed"
             }
+
       - name: Set-ActionOutput test (act)
         uses: ./
         id: Set-ActionOutput
@@ -64,3 +66,23 @@ jobs:
             if ('${{ steps.Set-ActionOutput.outputs.test-output }}' -cne 'test-value') {
               throw "Set-ActionOutput failed"
             }
+
+      - name: Add-ActionPath test (act)
+        uses: ./
+        with:
+          script: Add-ActionPath 'testing path'
+      - name: Add-ActionPath test (assert)
+        uses: ./
+        with:
+          script: |
+            if ($env:PATH -notlike "testing path$([System.IO.Path]::PathSeparator)*") {
+              throw "Add-ActionPath failed"
+            }
+
+      - name: Add-ActionSecret test (manual check whether host-sent value is masked)
+        uses: ./
+        with:
+          script: |
+            $secret = [System.Guid]::NewGuid()
+            Add-ActionSecret $secret
+            Write-Host $secret
