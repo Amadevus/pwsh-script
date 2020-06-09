@@ -50,79 +50,81 @@ Describe 'Get-ActionInput' {
     }
 }
 Describe 'Set-ActionOutput' {
-    Context "Given simple string value" {
-        BeforeAll {
-            Mock Write-Host { } -ModuleName GitHubActionsCore
-        }
-        It "Sends appropriate workflow command to host" {
-            Set-ActionOutput 'my-result' 'test value'
+    BeforeAll {
+        Mock Write-Host { } -ModuleName GitHubActionsCore
+    }
+    It "Sends appropriate workflow command to host" {
+        Set-ActionOutput 'my-result' 'test value'
 
-            Should -Invoke Write-Host -ParameterFilter {
-                $Object -eq '::set-output name=my-result::test value'
-            } -ModuleName GitHubActionsCore
-        }
+        Should -Invoke Write-Host -ParameterFilter {
+            $Object -eq '::set-output name=my-result::test value'
+        } -ModuleName GitHubActionsCore
     }
 }
 Describe 'Add-ActionSecret' {
-    Context "Given secret" {
-        BeforeAll {
-            Mock Write-Host { } -ModuleName GitHubActionsCore
-        }
-        It "Sends appropriate workflow command to host" {
-            Add-ActionSecret 'test value'
+    BeforeAll {
+        Mock Write-Host { } -ModuleName GitHubActionsCore
+    }
+    It "Sends appropriate workflow command to host" {
+        Add-ActionSecret 'test value'
 
-            Should -Invoke Write-Host -ParameterFilter {
-                $Object -eq '::add-mask::test value'
-            } -ModuleName GitHubActionsCore
-        }
+        Should -Invoke Write-Host -ParameterFilter {
+            $Object -eq '::add-mask::test value'
+        } -ModuleName GitHubActionsCore
     }
 }
 Describe 'Set-ActionVariable' {
-    Context "Given simple string value" {
-        BeforeAll {
-            Mock Write-Host { } -ModuleName GitHubActionsCore
-        }
-        It "Sends appropriate workflow command to host" {
-            Set-ActionVariable 'my-var' 'test value'
+    BeforeAll {
+        Mock Write-Host { } -ModuleName GitHubActionsCore
+    }
+    BeforeEach {
+        Remove-Item "Env:my-var" -ErrorAction SilentlyContinue
+    }
+    It "Given value '<value>', sends command with '<expectedcmd>' and sets env var to '<expectedenv>'" -TestCases @(
+        @{ Value = ''; ExpectedCmd = ''; ExpectedEnv = $null }
+        @{ Value = 'test value'; ExpectedCmd = 'test value'; ExpectedEnv = 'test value' }
+        @{ Value = 'A % B'; ExpectedCmd = 'A %25 B'; ExpectedEnv = 'A % B' }
+        @{ Value = [ordered]@{ a = '1x'; b = '2y'}; ExpectedCmd = '{"a":"1x","b":"2y"}'; ExpectedEnv = '{"a":"1x","b":"2y"}' }
+    ) {
+        Set-ActionVariable 'my-var' $Value
 
-            Should -Invoke Write-Host -ParameterFilter {
-                $Object -eq '::set-env name=my-var::test value'
-            } -ModuleName GitHubActionsCore
-            ## cleanup
-            [System.Environment]::SetEnvironmentVariable('my-var', $null)
-        }
+        ${env:my-var} | Should -Be $ExpectedEnv
+        Should -Invoke Write-Host -ParameterFilter {
+            $Object -eq "::set-env name=my-var::$ExpectedCmd"
+        } -ModuleName GitHubActionsCore
+    }
+    AfterEach {
+        Remove-Item "Env:my-var" -ErrorAction SilentlyContinue
     }
 }
 Describe 'Add-ActionPath' {
-    Context "Given simple string value" {
-        BeforeAll {
-            Mock Write-Host { } -ModuleName GitHubActionsCore
-        }
-        BeforeEach {
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
-            $prevPath = [System.Environment]::GetEnvironmentVariable('PATH')
-        }
-        It "Sends appropriate workflow command to host and prepends PATH" {
-            Add-ActionPath 'test path'
+    BeforeAll {
+        Mock Write-Host { } -ModuleName GitHubActionsCore
+    }
+    BeforeEach {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
+        $prevPath = [System.Environment]::GetEnvironmentVariable('PATH')
+    }
+    It "Sends appropriate workflow command to host and prepends PATH" {
+        Add-ActionPath 'test path'
 
-            $env:PATH | Should -BeLike "test path$([System.IO.Path]::PathSeparator)*" -Because 'PATH should be also prepended in current scope'
-            Should -Invoke Write-Host -ParameterFilter {
-                $Object -eq '::add-path::test path'
-            } -ModuleName GitHubActionsCore
-        }
-        It "Given SkipLocal switch, sends command but doesn't change PATH" {
-            $path = $env:PATH
+        $env:PATH | Should -BeLike "test path$([System.IO.Path]::PathSeparator)*" -Because 'PATH should be also prepended in current scope'
+        Should -Invoke Write-Host -ParameterFilter {
+            $Object -eq '::add-path::test path'
+        } -ModuleName GitHubActionsCore
+    }
+    It "Given SkipLocal switch, sends command but doesn't change PATH" {
+        $path = $env:PATH
 
-            Add-ActionPath 'test path' -SkipLocal
+        Add-ActionPath 'test path' -SkipLocal
 
-            $env:PATH | Should -Be $path -Because "PATH shouldn't be modified"
-            Should -Invoke Write-Host -ParameterFilter {
-                $Object -eq '::add-path::test path'
-            } -ModuleName GitHubActionsCore
-        }
-        AfterEach {
-            [System.Environment]::SetEnvironmentVariable('PATH', $prevPath)
-        }
+        $env:PATH | Should -Be $path -Because "PATH shouldn't be modified"
+        Should -Invoke Write-Host -ParameterFilter {
+            $Object -eq '::add-path::test path'
+        } -ModuleName GitHubActionsCore
+    }
+    AfterEach {
+        [System.Environment]::SetEnvironmentVariable('PATH', $prevPath)
     }
 }
 Describe 'Set-ActionCommandEcho' {
@@ -323,8 +325,8 @@ Describe 'Send-ActionCommand' {
     It "Given a command with params '<params>' writes '<expected>' to host" -TestCases @(
         @{ Params = @{ a = $null; b = '' }; Expected = '::test-cmd::' }
         @{ Params = @{ a = 'A' }; Expected = '::test-cmd a=A::' }
-        @{ Params = @{ a = 'A'; b = 'B' }; Expected = '::test-cmd a=A,b=B::' }
-        @{ Params = @{ a = "A `r B `n C : D , E % F" }; Expected = '::test-cmd a=A %0D B %0A C %3A D %2C E %25 F::' }
+        @{ Params = [ordered]@{ a = 'A'; b = 'B' }; Expected = '::test-cmd a=A,b=B::' }
+        @{ Params = [ordered]@{ a = "A `r B `n C : D , E % F" }; Expected = '::test-cmd a=A %0D B %0A C %3A D %2C E %25 F::' }
     ) {
         Send-ActionCommand test-cmd $Params
 

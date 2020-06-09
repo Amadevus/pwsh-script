@@ -10,7 +10,7 @@ SYNOPSIS
     
     
 SYNTAX
-    Send-ActionCommand [-Command] <String> [-Properties] <Hashtable> [[-Message] <String>] [<CommonParameters>]
+    Send-ActionCommand [-Command] <String> [-Properties] <IDictionary> [[-Message] <String>] [<CommonParameters>]
     
     Send-ActionCommand [-Command] <String> [[-Message] <String>] [<CommonParameters>]
     
@@ -22,6 +22,7 @@ DESCRIPTION
 
 PARAMETERS
     -Command <String>
+        The workflow command name.
         
         Required?                    true
         Position?                    1
@@ -29,7 +30,8 @@ PARAMETERS
         Accept pipeline input?       false
         Accept wildcard characters?  false
         
-    -Properties <Hashtable>
+    -Properties <IDictionary>
+        Properties to add to the command.
         
         Required?                    true
         Position?                    2
@@ -38,6 +40,7 @@ PARAMETERS
         Accept wildcard characters?  false
         
     -Message <String>
+        Message to add to the command.
         
         Required?                    false
         Position?                    3

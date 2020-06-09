@@ -505,7 +505,12 @@ Equivalent to `core.issue(cmd, msg)`/`core.issueCommand(cmd, props, msg)`.
 .DESCRIPTION
 Command Format:
   ::workflow-command parameter1={data},parameter2={data}::{command value}
-
+.PARAMETER Command
+The workflow command name.
+.PARAMETER Properties
+Properties to add to the command.
+.PARAMETER Message
+Message to add to the command.
 .EXAMPLE
 PS> Send-ActionCommand warning 'This is the user warning message'
 ::warning::This is the user warning message
@@ -523,7 +528,7 @@ function Send-ActionCommand {
         [string]$Command,
 
         [Parameter(ParameterSetName = "WithProps", Position = 1, Mandatory)]
-        [hashtable]$Properties,
+        [System.Collections.IDictionary]$Properties,
 
         [Parameter(ParameterSetName = "WithProps", Position = 2)]
         [Parameter(ParameterSetName = "SkipProps", Position = 1)]
@@ -556,7 +561,7 @@ function ConvertTo-ActionCommandString {
         [string]$Command,
 
         [Parameter(Position = 1)]
-        [hashtable]$Properties,
+        [System.Collections.IDictionary]$Properties,
 
         [Parameter(Position = 2)]
         [AllowNull()]
