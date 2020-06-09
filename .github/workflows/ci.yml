@@ -73,12 +73,12 @@ jobs:
       - name: Add-ActionPath test (act)
         uses: ./
         with:
-          script: Add-ActionPath 'testing path'
+          script: Add-ActionPath 'testing add-path'
       - name: Add-ActionPath test (assert)
         uses: ./
         with:
           script: |
-            if ($env:PATH -notlike "testing path$([System.IO.Path]::PathSeparator)*") {
+            if ($env:PATH -notlike "*testing add-path$([System.IO.Path]::PathSeparator)*") {
               throw "Add-ActionPath failed.`n$env:PATH"
             }
 
