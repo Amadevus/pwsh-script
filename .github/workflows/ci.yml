@@ -94,7 +94,7 @@ jobs:
         uses: ./
         with:
           script: |
-            Set-ActionVariable testvar [ordered]@{ 'a'=1; 'b'='c' }
+            Set-ActionVariable testvar [ordered]@{ a = 1; b = 'c' }
             if ($env:testvar -ne '{"a":1,"b":"c"}') {
               throw "Set-ActionVariable failed.`n$env:testvar"
             }
@@ -115,6 +115,7 @@ jobs:
             Set-ActionCommandEcho $true
             Set-ActionVariable echovar echo-on # should show up in logs
             Set-ActionCommandEcho $false
+
       - name: Set-ActionFailed test (act)
         uses: ./
         id: Set-ActionFailed
@@ -130,7 +131,7 @@ jobs:
             if ($result -ne 'failure') {
               throw "Set-ActionFailed failed.`n$result"
             }
-        
+
       - name: Get-ActionIsDebug
         uses: ./
         with:
