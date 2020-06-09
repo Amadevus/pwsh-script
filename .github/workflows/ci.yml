@@ -47,11 +47,13 @@ jobs:
         with:
           custom-input: "test"
           script: |
-            if ((Get-ActionInput script) -notlike 'if ((Get-ActionInput script)*') {
-              throw "Get-ActionInput for 'script' failed"
+            $script = Get-ActionInput script
+            if ($script -notlike '$script = Get-ActionInput script*') {
+              throw "Get-ActionInput for 'script' failed.`n$script"
             }
-            if ((Get-ActionInput custom-input) -cne 'test') {
-              throw "Get-ActionInput for 'custom-input' failed"
+            $custom = Get-ActionInput custom-input
+            if ($custom -cne 'test') {
+              throw "Get-ActionInput for 'custom-input' failed.`n$custom"
             }
 
       - name: Set-ActionOutput test (act)
@@ -63,8 +65,9 @@ jobs:
         uses: ./
         with:
           script: |
-            if ('${{ steps.Set-ActionOutput.outputs.test-output }}' -cne 'test-value') {
-              throw "Set-ActionOutput failed"
+            $output = '${{ steps.Set-ActionOutput.outputs.test-output }}'
+            if ($output -cne 'test-value') {
+              throw "Set-ActionOutput failed.`n$output"
             }
 
       - name: Add-ActionPath test (act)
@@ -76,7 +79,7 @@ jobs:
         with:
           script: |
             if ($env:PATH -notlike "testing path$([System.IO.Path]::PathSeparator)*") {
-              throw "Add-ActionPath failed"
+              throw "Add-ActionPath failed.`n$env:PATH"
             }
 
       - name: Add-ActionSecret test (manual check whether host-sent value is masked)
