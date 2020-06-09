@@ -37,3 +37,18 @@ jobs:
             Write-Host "::error::Documentation isn't up to date"
             return 1
           }
+  self-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Test Get-ActionInput
+        uses: ./
+        with:
+          custom-input: 'test'
+          script: |
+            if ((Get-ActionInput script) -notlike 'if ((Get-ActionInput script)*') {
+              throw "Get-ActionInput for 'script' failed"
+            }
+            if ((Get-ActionInput custom-input) -ne 'test') {
+              throw "Get-ActionInput for 'custom-input' failed"
+            }
