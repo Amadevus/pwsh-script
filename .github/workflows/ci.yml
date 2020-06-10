@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
   schedule:
-    - '0 10 * * 1' # At 10:00 on Monday.
+    - cron: '0 10 * * 1' # At 10:00 on Monday.
 defaults:
   run:
     shell: pwsh
