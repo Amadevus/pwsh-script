@@ -2,8 +2,10 @@
 
 GitHub Action to run PowerShell scripts that use the workflow run context - inspired by [actions/github-script].
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Amadevus/pwsh-script)](https://github.com/Amadevus/pwsh-script/releases/latest)
+![GitHub top language](https://img.shields.io/github/languages/top/Amadevus/pwsh-script?logo=powershell)
 [![CI](https://github.com/Amadevus/pwsh-script/workflows/CI/badge.svg?branch=master)](https://github.com/Amadevus/pwsh-script/actions?query=workflow%3ACI)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Amadevus/pwsh-script)](https://github.com/Amadevus/pwsh-script/releases/latest)
+![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/Amadevus/pwsh-script/latest)
 
 In order to use this action, `script` input is provided. The value of that input should be
 the body of a PowerShell script.
