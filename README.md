@@ -2,6 +2,9 @@
 
 GitHub Action to run PowerShell scripts that use the workflow run context - inspired by [actions/github-script].
 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Amadevus/pwsh-script)](https://github.com/Amadevus/pwsh-script/releases/latest)
+[![CI](https://github.com/Amadevus/pwsh-script/workflows/CI/badge.svg?branch=master)](https://github.com/Amadevus/pwsh-script/actions?query=workflow%3ACI)
+
 In order to use this action, `script` input is provided. The value of that input should be
 the body of a PowerShell script.
 
@@ -16,6 +19,16 @@ Environment variables are accessed in the standard PowerShell way (`$env:my_var`
 
 **Note** This action requires `pwsh` to actually be available and on PATH of the runner - which
 is the case for all GitHub-provided runner VMs; for your own runners you need to take care of that yourself.
+
+This action has an extensive self-testing suite in [CI workflow](.github/workflows/ci.yml).
+
+[actions/github-script]: https://github.com/actions/github-script
+[`@actions/core`]: https://github.com/actions/toolkit/tree/master/packages/core
+[`github` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#github-context
+[`job` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#job-context
+[`runner` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#runner-context
+[`strategy` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#strategy-context
+[`matrix` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#matrix-context
 
 ## Reading step results
 The return value of the script will be made available in the step's outputs under the `result` key.
@@ -66,6 +79,8 @@ that are available for JavaScript Actions by [`@actions/core`] package, such as:
 
 For module documentation, see [GitHubActionsCore README](docs/GitHubActionsCore/README.md).
 
+The module has a good test suite written in Pester.
+
 ## Examples
 
 ```yml
@@ -101,10 +116,10 @@ For module documentation, see [GitHubActionsCore README](docs/GitHubActionsCore/
       }
 ```
 
-[actions/github-script]: https://github.com/actions/github-script
-[`@actions/core`]: https://github.com/actions/toolkit/tree/master/packages/core
-[`github` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#github-context
-[`job` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#job-context
-[`runner` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#runner-context
-[`strategy` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#strategy-context
-[`matrix` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#matrix-context
+## Changelog
+
+Changelog is kept in [CHANGELOG.md](CHANGELOG.md)
+
+## License
+
+This action is licensed under [MIT license](LICENSE).
