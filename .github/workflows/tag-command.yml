@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.client_payload.slash_command.ref }}
-      - name: Resolve version and tag
+      - name: Resolve version, tag and push
         uses: ./
         with:
           script: |
@@ -41,9 +41,9 @@ jobs:
         with:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: |
-            Pushed tag [`${{ $github.event.client_payload.slash_command.arg1 }}`][tag]
+            Pushed tag [`${{ github.event.client_payload.slash_command.arg1 }}`][tag]
 
-            [tag]: https://github.com/${{ github.repository }}/tree/${{ $github.event.client_payload.slash_command.arg1 }}
+            [tag]: https://github.com/${{ github.repository }}/tree/${{ github.event.client_payload.slash_command.arg1 }}
           reactions: hooray
       - name: Add reaction to command comment on failure
         uses: peter-evans/create-or-update-comment@v1
