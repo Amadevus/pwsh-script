@@ -33,6 +33,29 @@ The return value of the script will be made available in the step's outputs unde
 If the script return value is a single string, it'll be set as the value of the `result` output directly.
 In any other case, it'll be passed to `ConvertTo-Json $Value -Depth 100 -Compress -EscapeHandling EscapeNonAscii`
 and the string result of that call will be set as the output value.
+```yml
+- uses: Amadevus/pwsh-script@v1
+  id: bad-script
+  with:
+    script: return [ordered]@{ x = 'a1'; y = 'b2' }
+  continue-on-error: true
+- run: echo '${{ steps.bad-script.outputs.result }}'
+  # should print {"x":"a1","y":"b2"}
+```
+
+## Error handling
+
+If the script throws an error/exception, it'll be caught, printed to the log and the error message
+will be set as an `error` output of the action.
+```yml
+- uses: Amadevus/pwsh-script@v1
+  id: bad-script
+  with:
+    script: 'throw "this fails"'
+  continue-on-error: true
+- run: echo "${{ steps.bad-script.outputs.error }}"
+  # should print 'this fails'
+```
 
 ## Actions cmdlets
 A module called `GitHubActionsCore` will be imported in the scope of your script. It provides commands
@@ -45,9 +68,38 @@ For module documentation, see [GitHubActionsCore README](docs/GitHubActionsCore/
 
 ## Examples
 
-TODO
+```yml
+- uses: Amadevus/pwsh-script@v1
+  id: script
+  with:
+    script: |
+      Write-ActionDebug "This will be visible only when ACTIONS_STEP_DEBUG secret is set"
 
+      # we have access to full context objects:
+      if ($github.event.repository.full_name -ne $github.repository) {
+        throw "something fishy's going on, repos don't match" # will cause step to fail
+      }
 
+      $someData = Get-MyCustomData
+      # this data may contain action-command-like strings (e.g. '::warning::...')
+      # we can prevent interpreting these by GitHub by printing them in NoCommandsBlock:
+      Invoke-ActionNoCommandsBlock -GenerateToken {
+        Write-Host $someData # this won't result in any commands
+      }
+      # now we can send commands again
+
+      # let's set env:BE_AWESOME=always, but for all the following actions/steps as well:
+      Set-ActionVariable BE_AWESOME always
+
+      # also we'll add path to our custom tool to PATH for the following steps:
+      $toolPath = Resolve-Path ./tools/bin
+      Add-ActionPath $toolPath
+
+      # let's also warn if it's too late for people to work in Greenwich ;)
+      if ([datetime]::UtcNow.Hour -ge 22) {
+        Write-ActionWarning "It's time to go to bed. Don't write code late at night! ⚠"
+      }
+```
 
 [actions/github-script]: https://github.com/actions/github-script
 [`@actions/core`]: https://github.com/actions/toolkit/tree/master/packages/core
