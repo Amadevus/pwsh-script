@@ -46,6 +46,7 @@ jobs:
       - name: Test that throwing causes action to fail (act)
         uses: ./
         id: test-throwing-fails-action
+        continue-on-error: true
         with:
           script: 'throw "test error message"'
       - name: Test that throwing causes action to fail (assert)
