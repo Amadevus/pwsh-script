@@ -2,8 +2,7 @@ name: PowerShell script
 author: Amadevus
 description: >
   Run PowerShell scripts within a hydrated context,
-  with @actions/core functions ported as cmdlets;
-  inspired heavily by actions/github-script.
+  with workflow-command cmdlets; inspired by actions/github-script.
 inputs:
   script:
     description: PowerShell script to execute in Actions-hydrated context
