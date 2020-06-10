@@ -42,7 +42,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Get-ActionInput tests
+      # throw
+      - name: Test that throwing causes action to fail (act)
+        uses: ./
+        id: test-throwing-fails-action
+        with:
+          script: 'throw "throwing test error message"'
+      - name: Test that throwing causes action to fail (assert)
+        run: |
+          $outcome = '${{ steps.test-throwing-fails-action.outcome }}'
+          if ($outcome -ne 'failure') {
+            Write-Host "::error::Throwing test failed.`n$outcome"
+            return 1
+          }
+
+      # Get-ActionInput
+      - name: Get-ActionInput test
         uses: ./
         with:
           custom-input: "test"
@@ -56,6 +71,7 @@ jobs:
               throw "Get-ActionInput for 'custom-input' failed.`n$custom"
             }
 
+      # Set-ActionOutput
       - name: Set-ActionOutput test (act)
         uses: ./
         id: Set-ActionOutput
@@ -70,6 +86,7 @@ jobs:
               throw "Set-ActionOutput failed.`n$output"
             }
 
+      # Add-ActionPath
       - name: Add-ActionPath test (act)
         uses: ./
         with:
@@ -82,6 +99,7 @@ jobs:
               throw "Add-ActionPath failed.`n$env:PATH"
             }
 
+      # Add-ActionSecret
       - name: Add-ActionSecret test (manual check whether host-sent value is masked)
         uses: ./
         with:
@@ -90,6 +108,7 @@ jobs:
             Add-ActionSecret $secret
             Write-Host $secret
 
+      # Set-ActionVariable
       - name: Set-ActionVariable test (act and first assert)
         uses: ./
         with:
@@ -107,6 +126,7 @@ jobs:
               throw "Set-ActionVariable failed.`n$env:testvar"
             }
 
+      # Set-ActionCommandEcho
       - name: Set-ActionCommandEcho test (manual check whether commands are shown in log)
         uses: ./
         with:
@@ -117,6 +137,7 @@ jobs:
             Set-ActionVariable echovar echo-on # should show up in logs
             Set-ActionCommandEcho $false
 
+      # Set-ActionFailed
       - name: Set-ActionFailed test (act)
         uses: ./
         id: Set-ActionFailed
@@ -133,7 +154,8 @@ jobs:
               throw "Set-ActionFailed failed.`n$result"
             }
 
-      - name: Get-ActionIsDebug
+      # Get-ActionIsDebug
+      - name: Get-ActionIsDebug test
         uses: ./
         with:
           script: |
@@ -142,6 +164,7 @@ jobs:
               throw "Get-ActionIsDebug failed.`n$result"
             }
 
+      # Invoke-ActionNoCommandsBlock
       - name: Invoke-ActionNoCommandsBlock test (act)
         uses: ./
         with:
