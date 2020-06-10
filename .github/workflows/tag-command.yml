@@ -1,0 +1,53 @@
+name: Tag command
+# trigger by chatops '/tag v1.0.0 ref=master force'
+# first non-named arg is interpreted as the tag name to be created
+# ref defaults to default repo branch and is the ref going to be tagged
+# 'force', if specified in args, adds `--force` to tagging operations (to move major tags like v1/v2)
+on:
+  repository_dispatch:
+    types: [tag-command]
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add run link to command comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: '[Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})'
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.slash_command.ref }}
+      - name: Resolve version and tag
+        uses: ./
+        with:
+          script: |
+            $args = $github.event.client_payload.slash_command.args -split ' '
+            $force = $args -contains 'force' ? 'force' : ''
+            $tag = $github.event.client_payload.slash_command.arg1
+            if (-not $tag) {
+              throw "Can't create empty-named tag. Please specify tag after command: /tag vX.Y.Z"
+            }
+            git tag $tag $force
+            if ($LASTEXITCODE -ne 0) {
+              throw "git tag $tag $force failed."
+            }
+            git push origin $tag $force
+            if ($LASTEXITCODE -ne 0) {
+              throw "git push origin $tag $force failed."
+            }
+      - name: Add tag info and reaction to command comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            Pushed tag [`${{ $github.event.client_payload.slash_command.arg1 }}`][tag]
+
+            [tag]: https://github.com/${{ github.repository }}/tree/${{ $github.event.client_payload.slash_command.arg1 }}
+          reactions: hooray
+      - name: Add reaction to command comment on failure
+        uses: peter-evans/create-or-update-comment@v1
+        if: failure()
+        with:
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          reactions: "-1"
