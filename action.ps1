@@ -20,6 +20,8 @@ try {
     Set-ActionOutput 'result' $result
 }
 catch {
-    Set-ActionFailed $_.ToString()
+    Set-ActionOutput 'error' $_.ToString()
+    $ErrorView = 'NormalView'
+    Set-ActionFailed ($_ | Out-String)
 }
 exit [System.Environment]::ExitCode

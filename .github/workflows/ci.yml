@@ -47,12 +47,17 @@ jobs:
         uses: ./
         id: test-throwing-fails-action
         with:
-          script: 'throw "throwing test error message"'
+          script: 'throw "test error message"'
       - name: Test that throwing causes action to fail (assert)
         run: |
           $outcome = '${{ steps.test-throwing-fails-action.outcome }}'
           if ($outcome -ne 'failure') {
-            Write-Host "::error::Throwing test failed.`n$outcome"
+            Write-Host "::error::Throwing test failed: invalid outcome.`n$outcome"
+            return 1
+          }
+          $errMsg = '${{ steps.test-throwing-fails-action.outputs.error }}'
+          if ($errMsg -ne 'test error message') {
+            Write-Host "::error::Throwing test failed: invalid error output.`n$errMsg"
             return 1
           }
 
