@@ -23,7 +23,7 @@ jobs:
         with:
           script: |
             # get body lines, skip first (command)
-            $bodyLines = $github.event.client_payload.github.payload.comment.body -split '\r?\n' | Select-Object -SkipFirst 1
+            $bodyLines = $github.event.client_payload.github.payload.comment.body -split '\r?\n' | Select-Object -Skip 1
             $body = $bodyLines -join "`n"
             $md = ConvertFrom-Markdown $body
             $codeBlocks = [Markdig.Syntax.MarkdownObjectExtensions]::Descendants($md.Tokens) | Where-Object { $_ -is [Markdig.Syntax.CodeBlock] }
