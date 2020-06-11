@@ -17,5 +17,9 @@ jobs:
                 "command": "tag",
                 "permission": "admin",
                 "named_args": true
+              },
+              {
+                "command": "demo",
+                "permission": "read"
               }
             ]
