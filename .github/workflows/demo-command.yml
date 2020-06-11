@@ -26,8 +26,7 @@ jobs:
             $bodyLines = $github.event.client_payload.github.payload.comment.body -split '\r?\n' | Select-Object -SkipFirst 1
             $body = $bodyLines -join "`n"
             $md = ConvertFrom-Markdown $body
-            using namespace Markdig.Syntax
-            $codeBlocks = [MarkdownObjectExtensions]::Descendants($md.Tokens) | Where-Object { $_ -is [CodeBlock] }
+            $codeBlocks = [Markdig.Syntax.MarkdownObjectExtensions]::Descendants($md.Tokens) | Where-Object { $_ -is [Markdig.Syntax.CodeBlock] }
             if ($codeBlocks) {
               $scriptAst = $codeBlocks | Select-Object -First 1
               $script = $scriptAst.Lines.ToString()
