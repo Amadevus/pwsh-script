@@ -21,12 +21,14 @@ jobs:
           Import-Module Pester -MinimumVersion '5.0'
           Invoke-Pester -CI
       - name: Invoke action
+        env:
+          TEMP: ${{ runner.temp }}
         run: |
-          $env:INPUT_SCRIPT = 'Write-Host "ok"; return "value"'
-          $output = node ./dist/index.js
+          $env:PWSH_SCRIPT_ACTION_TEXT = 'Write-Host "ok"; return "value"'
+          $output = pwsh -file ./action.ps1
           if ($LASTEXITCODE -ne 0) {
             $output | Write-Error
-            throw 'node failed'
+            throw 'pwsh failed'
           }
           $diff = Compare-Object @('ok','::set-output name=result::value') $output -CaseSensitive
           if ($diff) {
