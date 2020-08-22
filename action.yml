@@ -18,6 +18,7 @@ runs:
       id: script
       shell: pwsh
       env:
+        TEMP: ${{ runner.temp }}
         PWSH_SCRIPT_ACTION_TEXT: ${{ inputs.script }}
         PWSH_SCRIPT_ACTION_GITHUB: ${{ toJson(github) }}
         PWSH_SCRIPT_ACTION_JOB: ${{ toJson(job) }}
