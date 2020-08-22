@@ -5,6 +5,7 @@ on:
 jobs:
   dispatch:
     runs-on: ubuntu-latest
+    if: startsWith(github.event.comment.body, '/')
     steps:
       - name: /command dispatch
         uses: peter-evans/slash-command-dispatch@v1
