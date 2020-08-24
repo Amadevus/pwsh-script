@@ -11,6 +11,9 @@ outputs:
   result:
     description: Return value of script execution
     value: ${{ steps.script.outputs.result }}
+  error:
+    description: Exception details, if any was thrown during script execution.
+    value: ${{ steps.script.outputs.error }}
 runs:
   using: composite
   steps:

@@ -54,6 +54,34 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      # return string result
+      - name: Test that returned result string is not json serialized (act)
+        uses: ./
+        id: test-result-string
+        with:
+          script: return "testmsg"
+      - name: Test that returned result string is not json serialized (assert)
+        run: |
+          $result = '${{ steps.test-result-string.outputs.result }}'
+          if ($result -ne 'testmsg') {
+            Write-Host "::error::Return string test failed: invalid result.`n$result"
+            return 1
+          }
+
+      # return object result
+      - name: Test that returned result object is json serialized (act)
+        uses: ./
+        id: test-result-object
+        with:
+          script: return @{ a = 1; b = "c" }
+      - name: Test that returned result object is json serialized (assert)
+        run: |
+          $result = '${{ steps.test-result-object.outputs.result }}'
+          if ($result -ne '{"a":1,"b":"c"}') {
+            Write-Host "::error::Return object test failed: invalid result.`n$result"
+            return 1
+          }
+
       # throw
       - name: Test that throwing causes action to fail (act)
         uses: ./
