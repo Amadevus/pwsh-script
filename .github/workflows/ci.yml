@@ -102,8 +102,11 @@ jobs:
             return 1
           }
 
+
       # Get-ActionInput
+      # Get-ActionInput isn't really testable in a script
       - name: Get-ActionInput test
+        if: 'false'
         uses: ./
         with:
           custom-input: "test"
@@ -118,12 +121,15 @@ jobs:
             }
 
       # Set-ActionOutput
+      # Set-ActionOutput is tested by virtue of setting 'result' and 'error' outputs
       - name: Set-ActionOutput test (act)
+        if: 'false'
         uses: ./
         id: Set-ActionOutput
         with:
           script: Set-ActionOutput test-output 'test-value'
       - name: Set-ActionOutput test (assert)
+        if: 'false'
         uses: ./
         with:
           script: |
