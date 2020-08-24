@@ -73,7 +73,7 @@ jobs:
         uses: ./
         id: test-result-object
         with:
-          script: return @{ a = 1; b = "c" }
+          script: return [ordered]@{ a = 1; b = "c" }
       - name: Test that returned result object is json serialized (assert)
         run: |
           $result = '${{ steps.test-result-object.outputs.result }}'
