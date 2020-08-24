@@ -3,7 +3,8 @@ name: Demo command
 # example:
 # /demo
 # ```powershell
-# Write-Host "shows up in a log"
+# Write-Host "doesn't show up in a result comment, only in workflow logs"
+# Write-Output "shows up in a result comment"
 # ```
 on:
   repository_dispatch:
