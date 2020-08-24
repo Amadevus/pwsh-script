@@ -34,17 +34,15 @@ jobs:
             else {
               $script = $body
             }
-            # construct safe github ctx without token
-            $githubSafe = $github.Clone()
-            $githubSafe.Remove('token')
-            Set-ActionOutput githubSafe $githubSafe
             return $script
       - name: Execute user script
         uses: Amadevus/pwsh-script@v1
         id: user-script
         with:
-          github: ${{ steps.get-script-text.outputs.githubSafe }}
-          script: ${{ steps.get-script-text.outputs.result }}
+          script: |
+            $github.token = $null
+            $github.event.client_payload = $null
+            ${{ steps.get-script-text.outputs.result }}
       - name: Prettify result json
         uses: Amadevus/pwsh-script@v1
         id: pretty-result
