@@ -11,7 +11,6 @@ function Private:CreateContext($name) {
 
 Private:CreateContext github
 Private:CreateContext job
-Private:CreateContext steps
 Private:CreateContext runner
 Private:CreateContext strategy
 Private:CreateContext matrix

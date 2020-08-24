@@ -79,7 +79,7 @@ jobs:
           $result = '${{ steps.test-result-object.outputs.result }}'
           if ($result -ne '{"a":1,"b":"c"}') {
             Write-Host "::error::Return object test failed: invalid result.`n$result"
-            exit 1
+            return 1
           }
 
       # throw
@@ -94,19 +94,15 @@ jobs:
           $outcome = '${{ steps.test-throwing-fails-action.outcome }}'
           if ($outcome -ne 'failure') {
             Write-Host "::error::Throwing test failed: invalid outcome.`n$outcome"
-            exit 1
+            return 1
           }
           $errMsg = '${{ steps.test-throwing-fails-action.outputs.error }}'
           if ($errMsg -ne 'test error message') {
             Write-Host "::error::Throwing test failed: invalid error output.`n$errMsg"
-            exit 1
+            return 1
           }
 
       # check access to contexts
-      - id: skipped-step
-        if: "false"
-        run: return 0
-
       - name: Test that workflow contexts are available
         uses: ./
         with:
@@ -119,7 +115,6 @@ jobs:
             }
             Test-Value '$github.token' '${{ github.token }}'
             Test-Value '$job.status' '${{ job.status }}'
-            Test-Value '$steps."skipped-step".outcome' '${{ steps.skipped-step.outcome }}'
             Test-Value '$runner.os' '${{ runner.os }}'
             Test-Value '$strategy."fail-fast"' '${{ strategy.fail-fast }}'
             Test-Value '$matrix.os' '${{ matrix.os }}'
