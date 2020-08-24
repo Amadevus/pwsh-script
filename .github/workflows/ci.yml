@@ -21,12 +21,14 @@ jobs:
           Import-Module Pester -MinimumVersion '5.0'
           Invoke-Pester -CI
       - name: Invoke action
+        env:
+          TEMP: ${{ runner.temp }}
         run: |
-          $env:INPUT_SCRIPT = 'Write-Host "ok"; return "value"'
-          $output = node ./dist/index.js
+          $env:PWSH_SCRIPT_ACTION_TEXT = 'Write-Host "ok"; return "value"'
+          $output = pwsh -file ./action.ps1
           if ($LASTEXITCODE -ne 0) {
             $output | Write-Error
-            throw 'node failed'
+            throw 'pwsh failed'
           }
           $diff = Compare-Object @('ok','::set-output name=result::value') $output -CaseSensitive
           if ($diff) {
@@ -42,7 +44,7 @@ jobs:
           ./build-docs.ps1 -Clean
           if (git status --porcelain) {
             Write-Host "::error::Documentation isn't up to date"
-            return 1
+            exit 1
           }
   self-testing:
     strategy:
@@ -51,6 +53,34 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+
+      # return string result
+      - name: Test that returned result string is not json serialized (act)
+        uses: ./
+        id: test-result-string
+        with:
+          script: return "testmsg"
+      - name: Test that returned result string is not json serialized (assert)
+        run: |
+          $result = '${{ steps.test-result-string.outputs.result }}'
+          if ($result -ne 'testmsg') {
+            Write-Host "::error::Return string test failed: invalid result.`n$result"
+            exit 1
+          }
+
+      # return object result
+      - name: Test that returned result object is json serialized (act)
+        uses: ./
+        id: test-result-object
+        with:
+          script: return [ordered]@{ a = 1; b = "c" }
+      - name: Test that returned result object is json serialized (assert)
+        run: |
+          $result = '${{ steps.test-result-object.outputs.result }}'
+          if ($result -ne '{"a":1,"b":"c"}') {
+            Write-Host "::error::Return object test failed: invalid result.`n$result"
+            exit 1
+          }
 
       # throw
       - name: Test that throwing causes action to fail (act)
@@ -64,16 +94,35 @@ jobs:
           $outcome = '${{ steps.test-throwing-fails-action.outcome }}'
           if ($outcome -ne 'failure') {
             Write-Host "::error::Throwing test failed: invalid outcome.`n$outcome"
-            return 1
+            exit 1
           }
           $errMsg = '${{ steps.test-throwing-fails-action.outputs.error }}'
           if ($errMsg -ne 'test error message') {
             Write-Host "::error::Throwing test failed: invalid error output.`n$errMsg"
-            return 1
+            exit 1
           }
 
+      # check access to contexts
+      - name: Test that workflow contexts are available
+        uses: ./
+        with:
+          script: |
+            function Test-Value ($expression, $expected) {
+              $actual = Invoke-Expression $expression
+              if ("$actual" -ne $expected) {
+                throw "Failed assertion:'$expression' evaluated to '$actual', expected '$expected'."
+              }
+            }
+            Test-Value '$github.token' '${{ github.token }}'
+            Test-Value '$job.status' '${{ job.status }}'
+            Test-Value '$runner.os' '${{ runner.os }}'
+            Test-Value '$strategy."fail-fast"' '${{ strategy.fail-fast }}'
+            Test-Value '$matrix.os' '${{ matrix.os }}'
+
       # Get-ActionInput
+      # Get-ActionInput isn't really testable in a script
       - name: Get-ActionInput test
+        if: "false"
         uses: ./
         with:
           custom-input: "test"
@@ -88,12 +137,15 @@ jobs:
             }
 
       # Set-ActionOutput
+      # Set-ActionOutput is tested by virtue of setting 'result' and 'error' outputs
       - name: Set-ActionOutput test (act)
+        if: "false"
         uses: ./
         id: Set-ActionOutput
         with:
           script: Set-ActionOutput test-output 'test-value'
       - name: Set-ActionOutput test (assert)
+        if: "false"
         uses: ./
         with:
           script: |

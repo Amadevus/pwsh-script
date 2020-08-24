@@ -2,22 +2,24 @@
 
 Import-Module $PSScriptRoot/lib/GitHubActionsCore
 
-function CreateContext($name) {
-    $ctx = Get-ActionInput $name | ConvertFrom-Json -AsHashtable -NoEnumerate
+function Private:CreateContext($name) {
+    $varName = "PWSH_SCRIPT_ACTION_$($name.ToUpper())"
+    $value = (Get-ChildItem "Env:$varName" -ErrorAction:SilentlyContinue).Value
+    $ctx = "$value" | ConvertFrom-Json -AsHashtable -NoEnumerate
     Set-Variable -Name $name -Value $ctx -Scope Script -Option Constant
 }
 
-CreateContext github
-CreateContext job
-CreateContext runner
-CreateContext strategy
-CreateContext matrix
-
-Remove-Item Function:CreateContext
+Private:CreateContext github
+Private:CreateContext job
+Private:CreateContext runner
+Private:CreateContext strategy
+Private:CreateContext matrix
 
 try {
-    $result = Invoke-Expression "$(Get-ActionInput 'script' -Required)"
-    Set-ActionOutput 'result' $result
+    $Private:scriptFile = New-Item (Join-Path $env:TEMP "$(New-Guid).ps1") -ItemType File
+    Set-Content $Private:scriptFile "$env:PWSH_SCRIPT_ACTION_TEXT"
+    $Private:result = Invoke-Expression $Private:scriptFile
+    Set-ActionOutput 'result' $Private:result
 }
 catch {
     Set-ActionOutput 'error' $_.ToString()

@@ -7,32 +7,27 @@ inputs:
   script:
     description: PowerShell script to execute in Actions-hydrated context
     required: true
-  github:
-    description: "'github' workflow context"
-    required: false
-    default: ${{ toJson(github) }}
-  job:
-    description: "'job' workflow context"
-    required: false
-    default: ${{ toJson(job) }}
-  runner:
-    description: "'runner' workflow context"
-    required: false
-    default: ${{ toJson(runner) }}
-  strategy:
-    description: "'strategy' workflow context"
-    required: false
-    default: ${{ toJson(strategy) }}
-  matrix:
-    description: "'matrix' workflow context"
-    required: false
-    default: ${{ toJson(matrix) }}
 outputs:
   result:
     description: Return value of script execution
+    value: ${{ steps.script.outputs.result }}
+  error:
+    description: Exception details, if any was thrown during script execution.
+    value: ${{ steps.script.outputs.error }}
 runs:
-  using: node12
-  main: dist/index.js
+  using: composite
+  steps:
+    - run: ${{ github.action_path }}/action.ps1
+      id: script
+      shell: pwsh
+      env:
+        TEMP: ${{ runner.temp }}
+        PWSH_SCRIPT_ACTION_TEXT: ${{ inputs.script }}
+        PWSH_SCRIPT_ACTION_GITHUB: ${{ toJson(github) }}
+        PWSH_SCRIPT_ACTION_JOB: ${{ toJson(job) }}
+        PWSH_SCRIPT_ACTION_RUNNER: ${{ toJson(runner) }}
+        PWSH_SCRIPT_ACTION_STRATEGY: ${{ toJson(strategy) }}
+        PWSH_SCRIPT_ACTION_MATRIX: ${{ toJson(matrix) }}
 branding:
   icon: terminal
   color: blue

@@ -3,7 +3,8 @@ name: Demo command
 # example:
 # /demo
 # ```powershell
-# Write-Host "shows up in a log"
+# Write-Host "doesn't show up in a result comment, only in workflow logs"
+# Write-Output "shows up in a result comment"
 # ```
 on:
   repository_dispatch:
@@ -16,7 +17,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
-          body: '[Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})'
+          body: "[Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
       - name: Get script text
         uses: Amadevus/pwsh-script@v1
         id: get-script-text
@@ -34,17 +35,15 @@ jobs:
             else {
               $script = $body
             }
-            # construct safe github ctx without token
-            $githubSafe = $github.Clone()
-            $githubSafe.Remove('token')
-            Set-ActionOutput githubSafe $githubSafe
             return $script
       - name: Execute user script
         uses: Amadevus/pwsh-script@v1
         id: user-script
         with:
-          github: ${{ steps.get-script-text.outputs.githubSafe }}
-          script: ${{ steps.get-script-text.outputs.result }}
+          script: |
+            $github.token = $null
+            $github.event.client_payload = $null
+            ${{ steps.get-script-text.outputs.result }}
       - name: Prettify result json
         uses: Amadevus/pwsh-script@v1
         id: pretty-result

@@ -7,22 +7,14 @@ GitHub Action to run PowerShell scripts that use the workflow run context - insp
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Amadevus/pwsh-script)](https://github.com/Amadevus/pwsh-script/releases/latest)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/Amadevus/pwsh-script/latest)
 
-In order to use this action, `script` input is provided. The value of that input should be
+In order to use this action, `script` input is required. The value of that input should be
 the body of a PowerShell script.
-
-The following is initialized before your script is executed:
+The following variables are initialized before your script is executed:
 - `$github` is an object representing the workflow's [`github` context]
 - `$job` is an object representing the workflow's [`job` context]
 - `$runner` is an object representing the workflow's [`runner` context]
 - `$strategy` is an object representing the workflow's [`strategy` context]
 - `$matrix` is an object representing the workflow's [`matrix` context]
-
-Environment variables are accessed in the standard PowerShell way (`$env:my_var`).
-
-**Note** This action requires `pwsh` to actually be available and on PATH of the runner - which
-is the case for all GitHub-provided runner VMs; for your own runners you need to take care of that yourself.
-
-This action has an extensive self-testing suite in [CI workflow](.github/workflows/ci.yml).
 
 [actions/github-script]: https://github.com/actions/github-script
 [`@actions/core`]: https://github.com/actions/toolkit/tree/master/packages/core
@@ -31,6 +23,10 @@ This action has an extensive self-testing suite in [CI workflow](.github/workflo
 [`runner` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#runner-context
 [`strategy` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#strategy-context
 [`matrix` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#matrix-context
+
+## Demo
+
+You can try out this action yourself by commenting on a [demo issue](https://github.com/Amadevus/pwsh-script/issues/2). Instructions in the issue.
 
 ## Reading step results
 The return value of the script will be made available in the step's outputs under the `result` key.
@@ -75,13 +71,21 @@ will be set as an `error` output of the action.
 ## Actions cmdlets
 A module called `GitHubActionsCore` will be imported in the scope of your script. It provides commands
 that are available for JavaScript Actions by [`@actions/core`] package, such as:
-- `Set-ActionOutput`
+- `Add-ActionPath`
 - `Write-ActionWarning`
 - `Set-ActionFailed`
 
 For module documentation, see [GitHubActionsCore README](docs/GitHubActionsCore/README.md).
 
 The module has a good test suite written in Pester.
+
+## Notes
+
+- This action requires `pwsh` to actually be available and on PATH of the runner - which
+  is the case for all GitHub-provided runner VMs; for your own runners you need to take care of that yourself.
+- This action is a [`composite` action](https://docs.github.com/en/actions/creating-actions/creating-a-composite-run-steps-action).
+- This action has an extensive self-testing suite in [CI workflow](.github/workflows/ci.yml).
+- Although available in the imported module, `Get-ActionInput` and `Set-ActionOutput` won't really work when used as part of this action.
 
 ## Examples
 
@@ -90,29 +94,32 @@ The module has a good test suite written in Pester.
   id: script
   with:
     script: |
-      Write-ActionDebug "This will be visible only when ACTIONS_STEP_DEBUG secret is set"
+      Write-ActionDebug "Visible only when ACTIONS_STEP_DEBUG secret is set"
 
-      # we have access to full context objects:
+      # access full context objects:
       if ($github.event.repository.full_name -ne $github.repository) {
-        throw "something fishy's going on, repos don't match" # will cause step to fail
+        # throwing causes the step to fail
+        throw "something fishy's going on, repos don't match"
       }
 
       $someData = Get-MyCustomData
-      # this data may contain action-command-like strings (e.g. '::warning::...')
-      # we can prevent interpreting these by GitHub by printing them in NoCommandsBlock:
+      # data may contain workflow command strings (e.g. '::warning::...')
+      # prevent runner interpreting these
       Invoke-ActionNoCommandsBlock -GenerateToken {
-        Write-Host $someData # this won't result in any commands
+        # this won't result in any workflow commands
+        Write-Host $someData
+        Write-ActionError "not interpreted as error"
       }
-      # now we can send commands again
+      # commands work again
 
-      # let's set env:BE_AWESOME=always, but for all the following actions/steps as well:
+      # set env:BE_AWESOME=always here and for the following steps
       Set-ActionVariable BE_AWESOME always
 
-      # also we'll add path to our custom tool to PATH for the following steps:
+      # add our custom tool to PATH for the following steps:
       $toolPath = Resolve-Path ./tools/bin
       Add-ActionPath $toolPath
 
-      # let's also warn if it's too late for people to work in Greenwich ;)
+      # warn if it's too late for people to work in Greenwich ;)
       if ([datetime]::UtcNow.Hour -ge 22) {
         Write-ActionWarning "It's time to go to bed. Don't write code late at night! ⚠"
       }
