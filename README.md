@@ -7,10 +7,10 @@ GitHub Action to run PowerShell scripts that use the workflow run context - insp
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Amadevus/pwsh-script)](https://github.com/Amadevus/pwsh-script/releases/latest)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/Amadevus/pwsh-script/latest)
 
-In order to use this action, `script` input is provided. The value of that input should be
+In order to use this action, `script` input is required. The value of that input should be
 the body of a PowerShell script.
 
-The following is initialized before your script is executed:
+The following variables are initialized before your script is executed:
 - `$github` is an object representing the workflow's [`github` context]
 - `$job` is an object representing the workflow's [`job` context]
 - `$runner` is an object representing the workflow's [`runner` context]
@@ -75,13 +75,18 @@ will be set as an `error` output of the action.
 ## Actions cmdlets
 A module called `GitHubActionsCore` will be imported in the scope of your script. It provides commands
 that are available for JavaScript Actions by [`@actions/core`] package, such as:
-- `Set-ActionOutput`
+- `Add-ActionPath`
 - `Write-ActionWarning`
 - `Set-ActionFailed`
 
 For module documentation, see [GitHubActionsCore README](docs/GitHubActionsCore/README.md).
 
 The module has a good test suite written in Pester.
+
+## Notes
+
+- This action is written as a [`composite` action](https://docs.github.com/en/actions/creating-actions/creating-a-composite-run-steps-action).
+- Although available in the imported module, `Get-ActionInput` and `Set-ActionOutput` won't really work when used as part of this action.
 
 ## Examples
 
