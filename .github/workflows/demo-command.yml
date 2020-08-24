@@ -16,7 +16,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
-          body: '[Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})'
+          body: "[Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
       - name: Get script text
         uses: Amadevus/pwsh-script@v1
         id: get-script-text
