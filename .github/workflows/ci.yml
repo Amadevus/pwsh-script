@@ -102,6 +102,23 @@ jobs:
             return 1
           }
 
+      # check access to contexts
+      - name: Test that workflow contexts are available
+        uses: ./
+        with:
+          script: |
+            function Test-Value ($expression, $expected) {
+              $actual = Invoke-Expression $expression
+              if ("$actual" -ne $expected) {
+                throw "Failed assertion:'$expression' evaluated to '$actual', expected '$expected'."
+              }
+            }
+            Test-Value '$github.token' '${{ github.token }}'
+            Test-Value '$job.status' '${{ job.status }}'
+            Test-Value '$runner.os' '${{ runner.os }}'
+            Test-Value '$strategy.fail-fast' '${{ strategy.fail-fast }}'
+            Test-Value '$matrix.os' '${{ matrix.os }}'
+
       # Get-ActionInput
       # Get-ActionInput isn't really testable in a script
       - name: Get-ActionInput test
