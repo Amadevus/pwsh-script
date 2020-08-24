@@ -25,6 +25,7 @@ runs:
         PWSH_SCRIPT_ACTION_TEXT: ${{ inputs.script }}
         PWSH_SCRIPT_ACTION_GITHUB: ${{ toJson(github) }}
         PWSH_SCRIPT_ACTION_JOB: ${{ toJson(job) }}
+        PWSH_SCRIPT_ACTION_STEPS: ${{ toJson(steps) }}
         PWSH_SCRIPT_ACTION_RUNNER: ${{ toJson(runner) }}
         PWSH_SCRIPT_ACTION_STRATEGY: ${{ toJson(strategy) }}
         PWSH_SCRIPT_ACTION_MATRIX: ${{ toJson(matrix) }}
