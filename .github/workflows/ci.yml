@@ -44,7 +44,7 @@ jobs:
           ./build-docs.ps1 -Clean
           if (git status --porcelain) {
             Write-Host "::error::Documentation isn't up to date"
-            return 1
+            exit 1
           }
   self-testing:
     strategy:
@@ -65,7 +65,7 @@ jobs:
           $result = '${{ steps.test-result-string.outputs.result }}'
           if ($result -ne 'testmsg') {
             Write-Host "::error::Return string test failed: invalid result.`n$result"
-            return 1
+            exit 1
           }
 
       # return object result
@@ -79,7 +79,7 @@ jobs:
           $result = '${{ steps.test-result-object.outputs.result }}'
           if ($result -ne '{"a":1,"b":"c"}') {
             Write-Host "::error::Return object test failed: invalid result.`n$result"
-            return 1
+            exit 1
           }
 
       # throw
@@ -94,12 +94,12 @@ jobs:
           $outcome = '${{ steps.test-throwing-fails-action.outcome }}'
           if ($outcome -ne 'failure') {
             Write-Host "::error::Throwing test failed: invalid outcome.`n$outcome"
-            return 1
+            exit 1
           }
           $errMsg = '${{ steps.test-throwing-fails-action.outputs.error }}'
           if ($errMsg -ne 'test error message') {
             Write-Host "::error::Throwing test failed: invalid error output.`n$errMsg"
-            return 1
+            exit 1
           }
 
       # check access to contexts
