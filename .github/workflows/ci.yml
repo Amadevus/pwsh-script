@@ -116,7 +116,7 @@ jobs:
             Test-Value '$github.token' '${{ github.token }}'
             Test-Value '$job.status' '${{ job.status }}'
             Test-Value '$runner.os' '${{ runner.os }}'
-            Test-Value '$strategy.fail-fast' '${{ strategy.fail-fast }}'
+            Test-Value '$strategy."fail-fast"' '${{ strategy.fail-fast }}'
             Test-Value '$matrix.os' '${{ matrix.os }}'
 
       # Get-ActionInput
