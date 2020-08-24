@@ -16,7 +16,7 @@ Private:CreateContext strategy
 Private:CreateContext matrix
 
 try {
-    $Private:scriptFile = New-Item $env:TEMP,"$(New-Guid).ps1" -ItemType File
+    $Private:scriptFile = New-Item (Join-Path $env:TEMP "$(New-Guid).ps1") -ItemType File
     Set-Content $Private:scriptFile "$env:PWSH_SCRIPT_ACTION_TEXT"
     $Private:result = Invoke-Expression $Private:scriptFile
     Set-ActionOutput 'result' $Private:result
