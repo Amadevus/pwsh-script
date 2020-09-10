@@ -31,7 +31,7 @@ You can try out this action yourself by commenting on a [demo issue](https://git
 ## Reading step results
 The return value of the script will be made available in the step's outputs under the `result` key.
 ```yml
-- uses: Amadevus/pwsh-script@v1
+- uses: Amadevus/pwsh-script@v2
   id: my-script
   with:
     script: '1 + 1'
@@ -45,7 +45,7 @@ If the script return value is a single string, it'll be set as the value of the 
 In any other case, it'll be passed to `ConvertTo-Json $Value -Depth 100 -Compress -EscapeHandling EscapeNonAscii`
 and the string result of that call will be set as the output value.
 ```yml
-- uses: Amadevus/pwsh-script@v1
+- uses: Amadevus/pwsh-script@v2
   id: bad-script
   with:
     script: return [ordered]@{ x = 'a1'; y = 'b2' }
@@ -59,7 +59,7 @@ and the string result of that call will be set as the output value.
 If the script throws an error/exception, it'll be caught, printed to the log and the error message
 will be set as an `error` output of the action.
 ```yml
-- uses: Amadevus/pwsh-script@v1
+- uses: Amadevus/pwsh-script@v2
   id: bad-script
   with:
     script: 'throw "this fails"'
@@ -90,7 +90,7 @@ The module has a good test suite written in Pester.
 ## Examples
 
 ```yml
-- uses: Amadevus/pwsh-script@v1
+- uses: Amadevus/pwsh-script@v2
   id: script
   with:
     script: |
