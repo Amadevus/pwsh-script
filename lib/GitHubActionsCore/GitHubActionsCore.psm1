@@ -554,7 +554,8 @@ function Send-ActionCommand {
 
 <#
 .SYNOPSIS
-Sends message to an Action Environment File.
+Sends a command to an Action Environment File.
+Equivalent to `core.issueFileCommand(cmd, msg)`.
 .DESCRIPTION
 Appends given message to an Action Environment File.
 .PARAMETER Command
