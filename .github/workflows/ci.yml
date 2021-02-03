@@ -16,10 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Test with Pester
-        run: |
-          Install-Module -Name Pester -Force -SkipPublisherCheck -MinimumVersion '5.0'
-          Import-Module Pester -MinimumVersion '5.0'
-          Invoke-Pester -CI
+        run: ./test.ps1
       - name: Invoke action
         env:
           TEMP: ${{ runner.temp }}
