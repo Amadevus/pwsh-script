@@ -1,4 +1,4 @@
-Set-StrictMode -Version Latest
+#Requires -Module @{ ModuleName = 'Pester'; ModuleVersion = '5.1' }
 
 BeforeAll {
     Get-Module GitHubActionsCore | Remove-Module
@@ -74,6 +74,14 @@ Describe 'Add-ActionSecret' {
     }
 }
 Describe 'Set-ActionVariable' {
+    BeforeEach {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
+        $oldGithubEnv = $env:GITHUB_ENV
+        Remove-Item Env:GITHUB_ENV -ea:Ignore
+    }
+    AfterEach {
+        $env:GITHUB_ENV = $oldGithubEnv
+    }
     Context "Given value '<value>'" -Foreach @(
         @{ Value = ''; ExpectedCmd = ''; ExpectedEnv = $null }
         @{ Value = 'test value'; ExpectedCmd = 'test value'; ExpectedEnv = 'test value' }
@@ -83,6 +91,9 @@ Describe 'Set-ActionVariable' {
         Context "When GITHUB_ENV not set" {
             BeforeAll {
                 Mock Write-Host { } -ModuleName GitHubActionsCore
+            }
+            BeforeEach {
+                Remove-Item Env:GITHUB_ENV, Env:TESTVAR -ea:Ignore
             }
             It "Sends command with '<expectedcmd>' and sets env var to '<expectedenv>'" {
                 Set-ActionVariable TESTVAR $Value
@@ -99,6 +110,9 @@ Describe 'Set-ActionVariable' {
                 Should -Invoke Write-Host -ParameterFilter {
                     $Object -eq "::set-env name=TESTVAR::$ExpectedCmd"
                 } -ModuleName GitHubActionsCore
+            }
+            AfterEach {
+                Remove-Item Env:GITHUB_ENV, Env:TESTVAR -ea:Ignore
             }
             AfterEach {
                 Remove-Item Env:TESTVAR -ErrorAction SilentlyContinue
@@ -140,6 +154,14 @@ Describe 'Add-ActionPath' {
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
         $prevPath = [System.Environment]::GetEnvironmentVariable('PATH')
+        
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
+        $oldGithubPath = $env:GITHUB_PATH
+        Remove-Item Env:GITHUB_PATH -ea:Ignore
+    }
+    AfterEach {
+        [System.Environment]::SetEnvironmentVariable('PATH', $prevPath)
+        $env:GITHUB_PATH = $oldGithubPath
     }
     Context "When GITHUB_PATH is not set" {
         BeforeAll {
@@ -193,9 +215,6 @@ Describe 'Add-ActionPath' {
         AfterEach {
             Remove-Item Env:GITHUB_PATH -ea:Ignore
         }
-    }
-    AfterEach {
-        [System.Environment]::SetEnvironmentVariable('PATH', $prevPath)
     }
 }
 Describe 'Set-ActionCommandEcho' {
