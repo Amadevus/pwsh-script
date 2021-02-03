@@ -232,17 +232,20 @@ jobs:
       # Invoke-ActionNoCommandsBlock
       - name: Invoke-ActionNoCommandsBlock test (act)
         uses: ./
+        id: Invoke-ActionNoCommandsBlock
+        continue-on-error: true
         with:
           script: |
             Invoke-ActionNoCommandsBlock -GenerateToken {
-              Set-ActionVariable nocmdvar nocmd
+              Write-ActionError error-msg
             }
       - name: Invoke-ActionNoCommandsBlock test (assert)
         uses: ./
         with:
           script: |
-            if ($env:nocmdvar -ne $null) {
-              throw "Invoke-ActionNoCommandsBlock failed.`n$env:nocmdvar"
+            $result = '${{ steps.Invoke-ActionNoCommandsBlock.outcome }}'
+            if ($result -ne 'failure') {
+              throw "Invoke-ActionNoCommandsBlock failed.`n$result"
             }
 
       # Write-Action -Debug, -Info, -Warning, -Error and Grouping are not testable in any sensible manner
