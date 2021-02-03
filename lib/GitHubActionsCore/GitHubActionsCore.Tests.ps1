@@ -74,54 +74,125 @@ Describe 'Add-ActionSecret' {
     }
 }
 Describe 'Set-ActionVariable' {
-    BeforeAll {
-        Mock Write-Host { } -ModuleName GitHubActionsCore
-    }
-    BeforeEach {
-        Remove-Item "Env:my-var" -ErrorAction SilentlyContinue
-    }
-    It "Given value '<value>', sends command with '<expectedcmd>' and sets env var to '<expectedenv>'" -TestCases @(
+    Context "Given value '<value>'" -Foreach @(
         @{ Value = ''; ExpectedCmd = ''; ExpectedEnv = $null }
         @{ Value = 'test value'; ExpectedCmd = 'test value'; ExpectedEnv = 'test value' }
         @{ Value = 'A % B'; ExpectedCmd = 'A %25 B'; ExpectedEnv = 'A % B' }
         @{ Value = [ordered]@{ a = '1x'; b = '2y' }; ExpectedCmd = '{"a":"1x","b":"2y"}'; ExpectedEnv = '{"a":"1x","b":"2y"}' }
     ) {
-        Set-ActionVariable 'my-var' $Value
-
-        ${env:my-var} | Should -Be $ExpectedEnv
-        Should -Invoke Write-Host -ParameterFilter {
-            $Object -eq "::set-env name=my-var::$ExpectedCmd"
-        } -ModuleName GitHubActionsCore
-    }
-    AfterEach {
-        Remove-Item "Env:my-var" -ErrorAction SilentlyContinue
+        Context "When GITHUB_ENV not set" {
+            BeforeAll {
+                Mock Write-Host { } -ModuleName GitHubActionsCore
+            }
+            It "Sends command with '<expectedcmd>' and sets env var to '<expectedenv>'" {
+                Set-ActionVariable TESTVAR $Value
+        
+                ${env:TESTVAR} | Should -Be $ExpectedEnv
+                Should -Invoke Write-Host -ParameterFilter {
+                    $Object -eq "::set-env name=TESTVAR::$ExpectedCmd"
+                } -ModuleName GitHubActionsCore
+            }
+            It "Sends command with '<expectedcmd>' and doesn't set env var due to -SkipLocal" {
+                Set-ActionVariable TESTVAR $Value -SkipLocal
+        
+                ${env:TESTVAR} | Should -BeNullOrEmpty
+                Should -Invoke Write-Host -ParameterFilter {
+                    $Object -eq "::set-env name=TESTVAR::$ExpectedCmd"
+                } -ModuleName GitHubActionsCore
+            }
+            AfterEach {
+                Remove-Item Env:TESTVAR -ErrorAction SilentlyContinue
+            }
+        }
+        Context "When GITHUB_ENV is set" {
+            BeforeAll {
+                Mock Out-File { } -ModuleName GitHubActionsCore
+            }
+            BeforeEach {
+                $env:GITHUB_ENV = "foo.bar"
+                Mock Test-Path { $true } { $Path -eq $env:GITHUB_ENV } -ModuleName GitHubActionsCore
+            }
+            It "Appends command file with formatted command and sets env var to '<expectedenv>'" {
+                Set-ActionVariable TESTVAR $Value
+        
+                ${env:TESTVAR} | Should -Be $ExpectedEnv
+                $eol = [System.Environment]::NewLine
+                Should -Invoke Out-File -ParameterFilter {
+                    $InputObject -eq "TESTVAR<<_GitHubActionsFileCommandDelimeter_${eol}$ExpectedEnv${eol}_GitHubActionsFileCommandDelimeter_"
+                } -ModuleName GitHubActionsCore
+            }
+            It "Appends command file with formatted command and doesn't set env var due to -SkipLocal" {
+                Set-ActionVariable TESTVAR $Value -SkipLocal
+        
+                ${env:TESTVAR} | Should -BeNullOrEmpty
+                $eol = [System.Environment]::NewLine
+                Should -Invoke Out-File -ParameterFilter {
+                    $InputObject -eq "TESTVAR<<_GitHubActionsFileCommandDelimeter_${eol}$ExpectedEnv${eol}_GitHubActionsFileCommandDelimeter_"
+                } -ModuleName GitHubActionsCore
+            }
+            AfterEach {
+                Remove-Item Env:GITHUB_ENV, Env:TESTVAR -ea:Ignore
+            }
+        }
     }
 }
 Describe 'Add-ActionPath' {
-    BeforeAll {
-        Mock Write-Host { } -ModuleName GitHubActionsCore
-    }
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
         $prevPath = [System.Environment]::GetEnvironmentVariable('PATH')
     }
-    It "Sends appropriate workflow command to host and prepends PATH" {
-        Add-ActionPath 'test path'
-
-        $env:PATH | Should -BeLike "test path$([System.IO.Path]::PathSeparator)*" -Because 'PATH should be also prepended in current scope'
-        Should -Invoke Write-Host -ParameterFilter {
-            $Object -eq '::add-path::test path'
-        } -ModuleName GitHubActionsCore
+    Context "When GITHUB_PATH is not set" {
+        BeforeAll {
+            Mock Write-Host { } -ModuleName GitHubActionsCore
+        }
+        It "Sends appropriate workflow command to host and prepends PATH" {
+            Add-ActionPath 'test path'
+    
+            $env:PATH | Should -BeLike "test path$([System.IO.Path]::PathSeparator)*" -Because 'PATH should be also prepended in current scope'
+            Should -Invoke Write-Host -ParameterFilter {
+                $Object -eq '::add-path::test path'
+            } -ModuleName GitHubActionsCore
+        }
+        It "Given SkipLocal switch, sends command but doesn't change PATH" {
+            $path = $env:PATH
+    
+            Add-ActionPath 'test path' -SkipLocal
+    
+            $env:PATH | Should -Be $path -Because "PATH shouldn't be modified"
+            Should -Invoke Write-Host -ParameterFilter {
+                $Object -eq '::add-path::test path'
+            } -ModuleName GitHubActionsCore
+        }
     }
-    It "Given SkipLocal switch, sends command but doesn't change PATH" {
-        $path = $env:PATH
-
-        Add-ActionPath 'test path' -SkipLocal
-
-        $env:PATH | Should -Be $path -Because "PATH shouldn't be modified"
-        Should -Invoke Write-Host -ParameterFilter {
-            $Object -eq '::add-path::test path'
-        } -ModuleName GitHubActionsCore
+    Context "When GITHUB_PATH is set" {
+        BeforeAll {
+            Mock Out-File { } -ModuleName GitHubActionsCore
+        }
+        BeforeEach {
+            $env:GITHUB_PATH = "foo.bar"
+            Mock Test-Path { $true } { $Path -eq $env:GITHUB_PATH } -ModuleName GitHubActionsCore
+        }
+        It "Sends appropriate workflow command to command file and prepends PATH" {
+            Add-ActionPath 'test path'
+    
+            $env:PATH | Should -BeLike "test path$([System.IO.Path]::PathSeparator)*" -Because 'PATH should be also prepended in current scope'
+            Should -Invoke Out-File -ParameterFilter {
+                $InputObject -eq 'test path'
+            } -ModuleName GitHubActionsCore
+        }
+        It "Sends appropriate workflow command to command file but doesn't change PATH due to -SkipLocal" {
+            $path = $env:PATH
+    
+            Add-ActionPath 'test path' -SkipLocal
+    
+            $env:PATH | Should -Be $path -Because "PATH shouldn't be modified"
+            Should -Invoke Out-File -ParameterFilter {
+                $InputObject -eq 'test path'
+            } -ModuleName GitHubActionsCore
+        }
+        AfterEach {
+            Remove-Item Env:GITHUB_PATH -ea:Ignore
+        }
     }
     AfterEach {
         [System.Environment]::SetEnvironmentVariable('PATH', $prevPath)
@@ -333,5 +404,59 @@ Describe 'Send-ActionCommand' {
         Should -Invoke Write-Host -ParameterFilter {
             $Object -eq $Expected
         } -ModuleName GitHubActionsCore
+    }
+}
+
+Describe 'Send-ActionFileCommand' {
+    It "Given no command ('<value>') throws" -TestCases @(
+        @{ Value = $null }
+        @{ Value = '' }
+    ) {
+        {
+            Send-ActionFileCommand -Command $Value -Message 'foobar'
+        } | Should -Throw "Cannot validate argument on parameter 'Command'. The argument is null or empty.*"
+    }
+    It "Given command for which env var doesn't exist" {
+        Remove-Item env:GITHUB_FOO -ea:Ignore
+        {
+            Send-ActionFileCommand -Command FOO -Message 'foobar'
+        } | Should -Throw 'Unable to find environment variable for file command FOO'
+    }
+    It "Given command for which file doesn't exist" {
+        $env:GITHUB_FOO = 'foo.bar'
+        {
+            Send-ActionFileCommand -Command FOO -Message 'foobar'
+        } | Should -Throw 'Missing file at path: *foo.bar'
+        Remove-Item env:GITHUB_FOO -ea:Ignore
+    }
+    Context 'When file exists' {
+        BeforeAll {
+            Mock Test-Path { return $true } -ModuleName GitHubActionsCore
+            Mock Out-File { } -ModuleName GitHubActionsCore
+        }
+        BeforeEach {
+            $testPath = 'test-path'
+            $env:GITHUB_TESTCMD = $testPath
+        }
+        It "Given a command with message '<msg>' writes '<expected>' to a file" -TestCases @(
+            @{ Msg = ''; Expected = $null }
+            @{ Msg = 'a'; Expected = $null }
+            @{ Msg = "a `r `n b : c % d"; Expected = $null }
+            @{ Msg = 1; Expected = $null }
+            @{ Msg = $true; Expected = 'true' }
+            @{ Msg = @{ a = 1; b = $false }; Expected = '{"a":1,"b":false}' }
+        ) {
+            $Expected = $Expected ?? "$Msg"
+            Send-ActionFileCommand TESTCMD -Message $Msg
+    
+            Should -Invoke Out-File -ParameterFilter {
+                $FilePath -eq $testPath -and
+                $Append -and
+                $InputObject -ceq $Expected
+            } -ModuleName GitHubActionsCore
+        }
+        AfterEach {
+            Remove-Item env:GITHUB_TEST -ea:Ignore
+        }
     }
 }
