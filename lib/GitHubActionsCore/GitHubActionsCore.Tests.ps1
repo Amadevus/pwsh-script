@@ -154,7 +154,7 @@ Describe 'Add-ActionPath' {
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
         $prevPath = [System.Environment]::GetEnvironmentVariable('PATH')
-        
+
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
         $oldGithubPath = $env:GITHUB_PATH
         Remove-Item Env:GITHUB_PATH -ea:Ignore
@@ -450,7 +450,7 @@ Describe 'Send-ActionFileCommand' {
     }
     Context 'When file exists' {
         BeforeAll {
-            Mock Test-Path { return $true } -ModuleName GitHubActionsCore
+            Mock Test-Path { $true } -ModuleName GitHubActionsCore
             Mock Out-File { } -ModuleName GitHubActionsCore
         }
         BeforeEach {
@@ -475,7 +475,7 @@ Describe 'Send-ActionFileCommand' {
             } -ModuleName GitHubActionsCore
         }
         AfterEach {
-            Remove-Item env:GITHUB_TEST -ea:Ignore
+            Remove-Item env:GITHUB_TESTCMD -ea:Ignore
         }
     }
 }
