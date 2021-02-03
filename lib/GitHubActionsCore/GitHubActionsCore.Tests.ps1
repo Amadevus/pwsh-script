@@ -77,7 +77,7 @@ Describe 'Set-ActionVariable' {
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
         $oldGithubEnv = $env:GITHUB_ENV
-        Remove-Item Env:GITHUB_ENV -ea:Ignore
+        $env:GITHUB_ENV = $null
     }
     AfterEach {
         $env:GITHUB_ENV = $oldGithubEnv
@@ -157,7 +157,7 @@ Describe 'Add-ActionPath' {
 
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterEach')]
         $oldGithubPath = $env:GITHUB_PATH
-        Remove-Item Env:GITHUB_PATH -ea:Ignore
+        $env:GITHUB_PATH = $null
     }
     AfterEach {
         [System.Environment]::SetEnvironmentVariable('PATH', $prevPath)
@@ -212,9 +212,6 @@ Describe 'Add-ActionPath' {
                 $InputObject -eq 'test path'
             } -ModuleName GitHubActionsCore
         }
-        AfterEach {
-            Remove-Item Env:GITHUB_PATH -ea:Ignore
-        }
     }
 }
 Describe 'Set-ActionCommandEcho' {
@@ -259,9 +256,14 @@ Describe 'Set-ActionFailed' {
 Describe 'Get-ActionIsDebug' {
     BeforeAll {
         Mock Write-Host { } -ModuleName GitHubActionsCore
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterAll')]
+        $oldEnvRunnerDebug = $env:RUNNER_DEBUG
+    }
+    AfterAll {
+        $env:RUNNER_DEBUG = $oldEnvRunnerDebug
     }
     BeforeEach {
-        Remove-Item Env:RUNNER_DEBUG -ErrorAction SilentlyContinue
+        $env:RUNNER_DEBUG = $null
     }
     It 'Given env var is not set, return false' {
         $result = Get-ActionIsDebug
@@ -281,9 +283,6 @@ Describe 'Get-ActionIsDebug' {
         $result = Get-ActionIsDebug
         
         $result | Should -BeExactly $Expected
-    }
-    AfterEach {
-        Remove-Item Env:RUNNER_DEBUG -ErrorAction SilentlyContinue
     }
 }
 Describe 'Write-ActionError' {
@@ -436,7 +435,7 @@ Describe 'Send-ActionFileCommand' {
         } | Should -Throw "Cannot validate argument on parameter 'Command'. The argument is null or empty.*"
     }
     It "Given command for which env var doesn't exist" {
-        Remove-Item env:GITHUB_FOO -ea:Ignore
+        $env:GITHUB_FOO = $null
         {
             Send-ActionFileCommand -Command FOO -Message 'foobar'
         } | Should -Throw 'Unable to find environment variable for file command FOO'
@@ -446,7 +445,7 @@ Describe 'Send-ActionFileCommand' {
         {
             Send-ActionFileCommand -Command FOO -Message 'foobar'
         } | Should -Throw 'Missing file at path: *foo.bar'
-        Remove-Item env:GITHUB_FOO -ea:Ignore
+        $env:GITHUB_FOO = $null
     }
     Context 'When file exists' {
         BeforeAll {
@@ -475,7 +474,7 @@ Describe 'Send-ActionFileCommand' {
             } -ModuleName GitHubActionsCore
         }
         AfterEach {
-            Remove-Item env:GITHUB_TESTCMD -ea:Ignore
+            $env:GITHUB_TESTCMD = $null
         }
     }
 }
