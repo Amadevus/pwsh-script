@@ -10,7 +10,7 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     env:
-      tag_name: ${{ github.event.client_payload.slash_command.unnamed.arg1 }}
+      tag_name: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}
     steps:
       - name: Add run link to command comment
         uses: peter-evans/create-or-update-comment@v1
@@ -19,12 +19,12 @@ jobs:
           body: "[Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
       - uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.client_payload.slash_command.named.ref }}
+          ref: ${{ github.event.client_payload.slash_command.args.named.ref }}
       - name: Resolve version, tag and push
         uses: ./
         with:
           script: |
-            $args = $github.event.client_payload.slash_command.unnamed
+            $args = $github.event.client_payload.slash_command.args.unnamed
             $force = ($args.GetEnumerator() | ? Value -eq 'force') ? '--force' : ''
             $tag = $env:tag_name
             if (-not $tag) {
