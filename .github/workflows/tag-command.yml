@@ -23,7 +23,7 @@ jobs:
         with:
           script: |
             $args = $github.event.client_payload.slash_command.args -split ' '
-            $force = $args -contains 'force' ? 'force' : ''
+            $force = $args -contains 'force' ? '--force' : ''
             $tag = $github.event.client_payload.slash_command.arg1
             if (-not $tag) {
               throw "Can't create empty-named tag. Please specify tag after command: /tag vX.Y.Z"
