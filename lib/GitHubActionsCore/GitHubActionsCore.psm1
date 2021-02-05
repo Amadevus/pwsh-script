@@ -37,15 +37,23 @@ function Set-ActionVariable {
         [switch]$SkipLocal
     )
     $convertedValue = ConvertTo-ActionCommandValue $Value
-    ## To take effect only in the current action/step
+    ## To take effect in the current action/step
     if (-not $SkipLocal) {
         [System.Environment]::SetEnvironmentVariable($Name, $convertedValue)
     }
 
     ## To take effect for all subsequent actions/steps
-    Send-ActionCommand set-env @{
-        name = $Name
-    } -Message $convertedValue
+    if ($env:GITHUB_ENV) {
+        $delimiter = '_GitHubActionsFileCommandDelimeter_'
+        $eol = [System.Environment]::NewLine
+        $commandValue = "$name<<${delimiter}${eol}${convertedValue}${eol}${delimiter}"
+        Send-ActionFileCommand -Command ENV -Message $commandValue
+    }
+    else {
+        Send-ActionCommand set-env @{
+            name = $Name
+        } -Message $convertedValue
+    }
 }
 
 <#
@@ -93,7 +101,7 @@ function Add-ActionPath {
         [switch]$SkipLocal
     )
 
-    ## To take effect only in the current action/step
+    ## To take effect in the current action/step
     if (-not $SkipLocal) {
         $oldPath = [System.Environment]::GetEnvironmentVariable('PATH')
         $newPath = "$Path$([System.IO.Path]::PathSeparator)$oldPath"
@@ -101,7 +109,12 @@ function Add-ActionPath {
     }
 
     ## To take effect for all subsequent actions/steps
-    Send-ActionCommand add-path $Path
+    if ($env:GITHUB_PATH) {
+        Send-ActionFileCommand -Command PATH -Message $Path
+    }
+    else {
+        Send-ActionCommand -Command add-path -Message $Path
+    }
 }
 
 ## Used to identify inputs from env vars in Action/Workflow context
@@ -539,6 +552,47 @@ function Send-ActionCommand {
     Write-Host $cmdStr
 }
 
+<#
+.SYNOPSIS
+Sends a command to an Action Environment File.
+Equivalent to `core.issueFileCommand(cmd, msg)`.
+.DESCRIPTION
+Appends given message to an Action Environment File.
+.PARAMETER Command
+Command (environment file variable suffix) to send message for.
+.PARAMETER Message
+Message to append.
+.EXAMPLE
+PS> Send-ActionFileCommand ENV 'myvar=value'
+.EXAMPLE
+PS> 'myvar=value', 'myvar2=novalue' | Send-ActionFileCommand ENV
+.LINK
+https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#environment-files
+#>
+function Send-ActionFileCommand {
+    [CmdletBinding()]
+    param (
+        [Parameter(Position = 0, Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Command,
+
+        [Parameter(Position = 1, Mandatory, ValueFromPipeline)]
+        [psobject]$Message
+    )
+    begin {
+        $filePath = [System.Environment]::GetEnvironmentVariable("GITHUB_$Command")
+        if (-not $filePath) {
+            throw "Unable to find environment variable for file command $Command"
+        }
+        if (-not (Test-Path $filePath -PathType Leaf)) {
+            throw "Missing file at path: $filePath"
+        }
+    }
+    process {
+        ConvertTo-ActionCommandValue $Message | Out-File -FilePath $filePath -Append
+    }
+}
+
 ###########################################################################
 ## Internal Implementation
 ###########################################################################
@@ -669,6 +723,7 @@ Get-ActionIsDebug,
 Invoke-ActionGroup,
 Invoke-ActionNoCommandsBlock,
 Send-ActionCommand,
+Send-ActionFileCommand,
 Set-ActionCommandEcho,
 Set-ActionFailed,
 Set-ActionOutput,

@@ -16,10 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Test with Pester
-        run: |
-          Install-Module -Name Pester -Force -SkipPublisherCheck -MinimumVersion '5.0'
-          Import-Module Pester -MinimumVersion '5.0'
-          Invoke-Pester -CI
+        run: ./test.ps1
       - name: Invoke action
         env:
           TEMP: ${{ runner.temp }}
@@ -234,18 +231,20 @@ jobs:
 
       # Invoke-ActionNoCommandsBlock
       - name: Invoke-ActionNoCommandsBlock test (act)
-        uses: ./
-        with:
-          script: |
+        id: Invoke-ActionNoCommandsBlock
+        shell: pwsh
+        run: |
+            Import-Module ./lib/GitHubActionsCore -Force
             Invoke-ActionNoCommandsBlock -GenerateToken {
-              Set-ActionVariable nocmdvar nocmd
+              Set-ActionOutput testout testval
             }
       - name: Invoke-ActionNoCommandsBlock test (assert)
         uses: ./
         with:
           script: |
-            if ($env:nocmdvar -ne $null) {
-              throw "Invoke-ActionNoCommandsBlock failed.`n$env:nocmdvar"
+            $result = '${{ steps.Invoke-ActionNoCommandsBlock.outputs.testout }}'
+            if ($result) {
+              throw "Invoke-ActionNoCommandsBlock failed.`n$result"
             }
 
       # Write-Action -Debug, -Info, -Warning, -Error and Grouping are not testable in any sensible manner

@@ -9,6 +9,7 @@
 | [Invoke-ActionGroup](Invoke-ActionGroup.md) | Executes the argument script block within an output group. Equivalent of `core.group(name, func)`. |
 | [Invoke-ActionNoCommandsBlock](Invoke-ActionNoCommandsBlock.md) | Invokes a scriptblock that won't result in any output interpreted as a workflow command. Useful for printing arbitrary text that may contain command-like text. No quivalent in `@actions/core` package. |
 | [Send-ActionCommand](Send-ActionCommand.md) | Sends a command to the hosting Workflow/Action context. Equivalent to `core.issue(cmd, msg)`/`core.issueCommand(cmd, props, msg)`. |
+| [Send-ActionFileCommand](Send-ActionFileCommand.md) | Sends a command to an Action Environment File. Equivalent to `core.issueFileCommand(cmd, msg)`. |
 | [Set-ActionCommandEcho](Set-ActionCommandEcho.md) | Enables or disables the echoing of commands into stdout for the rest of the step. Echoing is disabled by default if ACTIONS_STEP_DEBUG is not set. Equivalent of `core.setCommandEcho(enabled)`. |
 | [Set-ActionFailed](Set-ActionFailed.md) | Sets an action status to failed. When the action exits it will be with an exit code of 1. Equivalent of `core.setFailed(message)`. |
 | [Set-ActionOutput](Set-ActionOutput.md) | Sets the value of an output. Equivalent of `core.setOutput(name, value)`. |
