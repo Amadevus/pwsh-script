@@ -218,6 +218,8 @@ Describe 'Set-ActionCommandEcho' {
 }
 Describe 'Set-ActionFailed' {
     BeforeAll {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterAll')]
+        $oldExitCode = [System.Environment]::ExitCode
         Mock Write-Host { } -ModuleName GitHubActionsCore
     }
     BeforeEach {
@@ -236,8 +238,8 @@ Describe 'Set-ActionFailed' {
             $Object -eq "::error::$Expected"
         } -ModuleName GitHubActionsCore
     }
-    AfterEach {
-        [System.Environment]::ExitCode = 0
+    AfterAll {
+        [System.Environment]::ExitCode = $oldExitCode
     }
 }
 Describe 'Get-ActionIsDebug' {
@@ -246,11 +248,11 @@ Describe 'Get-ActionIsDebug' {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterAll')]
         $oldEnvRunnerDebug = $env:RUNNER_DEBUG
     }
-    AfterAll {
-        $env:RUNNER_DEBUG = $oldEnvRunnerDebug
-    }
     BeforeEach {
         $env:RUNNER_DEBUG = $null
+    }
+    AfterAll {
+        $env:RUNNER_DEBUG = $oldEnvRunnerDebug
     }
     It 'Given env var is not set, return false' {
         $result = Get-ActionIsDebug
@@ -458,7 +460,7 @@ Describe 'Send-ActionFileCommand' {
             @{ Msg = "a `r `n b : c % d"; Expected = $null }
             @{ Msg = 1; Expected = $null }
             @{ Msg = $true; Expected = 'true' }
-            @{ Msg = @{ a = 1; b = $false }; Expected = '{"a":1,"b":false}' }
+            @{ Msg = [ordered]@{ a = 1; b = $false }; Expected = '{"a":1,"b":false}' }
         ) {
             Send-ActionFileCommand TESTCMD -Message $Msg
 
