@@ -30,14 +30,8 @@ jobs:
             if (-not $tag) {
               throw "Can't create empty-named tag. Please specify tag after command: /tag vX.Y.Z"
             }
-            git tag $tag $force
-            if ($LASTEXITCODE -ne 0) {
-              throw "git tag $tag $force failed."
-            }
-            git push origin $tag $force
-            if ($LASTEXITCODE -ne 0) {
-              throw "git push origin $tag $force failed."
-            }
+            git tag $tag $force || (throw "git tag $tag $force failed.")
+            git push origin $tag $force || (throw "git push origin $tag $force failed.")
       - name: Add tag info and reaction to command comment
         uses: peter-evans/create-or-update-comment@v1
         with:
