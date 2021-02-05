@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2021-02-05
+
 ### Added
 - `Send-ActionFileCommand` cmdlet that handles sending commands to [Environment Files] instead of console output ([#8]).
 
@@ -36,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial action code
 - `GitHubActionsCore` PowerShell module
 
-[Unreleased]: https://github.com/Amadevus/pwsh-script/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/Amadevus/pwsh-script/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/Amadevus/pwsh-script/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Amadevus/pwsh-script/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/Amadevus/pwsh-script/releases/tag/v1.0.0
