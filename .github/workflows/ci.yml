@@ -231,20 +231,19 @@ jobs:
 
       # Invoke-ActionNoCommandsBlock
       - name: Invoke-ActionNoCommandsBlock test (act)
-        uses: ./
         id: Invoke-ActionNoCommandsBlock
-        continue-on-error: true
-        with:
-          script: |
+        shell: pwsh
+        run: |
+            Import-Module ./lib/GitHubActionsCore -Force
             Invoke-ActionNoCommandsBlock -GenerateToken {
-              Write-ActionError error-msg
+              Set-ActionOutput testout testval
             }
       - name: Invoke-ActionNoCommandsBlock test (assert)
         uses: ./
         with:
           script: |
-            $result = '${{ steps.Invoke-ActionNoCommandsBlock.outcome }}'
-            if ($result -ne 'failure') {
+            $result = '${{ steps.Invoke-ActionNoCommandsBlock.outputs.testout }}'
+            if ($result -cne 'testval') {
               throw "Invoke-ActionNoCommandsBlock failed.`n$result"
             }
 
