@@ -37,12 +37,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build module docs
-        run: |
-          ./build-docs.ps1 -Clean
-          if (git status --porcelain) {
-            Write-Host "::error::Documentation isn't up to date"
-            exit 1
-          }
+        uses: ./
+        with:
+          script: |
+            ./build-docs.ps1 -Clean
+            git status --porcelain || (throw "Documentation isn't up to date. Run 'build-docs.ps1' and commit changes.")
   self-testing:
     strategy:
       matrix:
@@ -60,7 +59,7 @@ jobs:
       - name: Test that returned result string is not json serialized (assert)
         run: |
           $result = '${{ steps.test-result-string.outputs.result }}'
-          if ($result -ne 'testmsg') {
+          if ($result -cne 'testmsg') {
             Write-Host "::error::Return string test failed: invalid result.`n$result"
             exit 1
           }
@@ -74,7 +73,7 @@ jobs:
       - name: Test that returned result object is json serialized (assert)
         run: |
           $result = '${{ steps.test-result-object.outputs.result }}'
-          if ($result -ne '{"a":1,"b":"c"}') {
+          if ($result -cne '{"a":1,"b":"c"}') {
             Write-Host "::error::Return object test failed: invalid result.`n$result"
             exit 1
           }
@@ -89,12 +88,12 @@ jobs:
       - name: Test that throwing causes action to fail (assert)
         run: |
           $outcome = '${{ steps.test-throwing-fails-action.outcome }}'
-          if ($outcome -ne 'failure') {
+          if ($outcome -cne 'failure') {
             Write-Host "::error::Throwing test failed: invalid outcome.`n$outcome"
             exit 1
           }
           $errMsg = '${{ steps.test-throwing-fails-action.outputs.error }}'
-          if ($errMsg -ne 'test error message') {
+          if ($errMsg -cne 'test error message') {
             Write-Host "::error::Throwing test failed: invalid error output.`n$errMsg"
             exit 1
           }
@@ -106,7 +105,7 @@ jobs:
           script: |
             function Test-Value ($expression, $expected) {
               $actual = Invoke-Expression $expression
-              if ("$actual" -ne $expected) {
+              if ("$actual" -cne $expected) {
                 throw "Failed assertion:'$expression' evaluated to '$actual', expected '$expected'."
               }
             }
@@ -134,20 +133,17 @@ jobs:
             }
 
       # Set-ActionOutput
-      # Set-ActionOutput is tested by virtue of setting 'result' and 'error' outputs
       - name: Set-ActionOutput test (act)
-        if: "false"
-        uses: ./
         id: Set-ActionOutput
-        with:
-          script: Set-ActionOutput test-output 'test-value'
+        run: |
+            Import-Module ./lib/GitHubActionsCore -Force
+            Set-ActionOutput testout testval
       - name: Set-ActionOutput test (assert)
-        if: "false"
         uses: ./
         with:
           script: |
-            $output = '${{ steps.Set-ActionOutput.outputs.test-output }}'
-            if ($output -cne 'test-value') {
+            $output = '${{ steps.Set-ActionOutput.outputs.testout }}'
+            if ($output -cne 'testval') {
               throw "Set-ActionOutput failed.`n$output"
             }
 
@@ -180,14 +176,14 @@ jobs:
           script: |
             $props = [ordered]@{ a = 1; b = 'c' }
             Set-ActionVariable testvar $props
-            if ($env:testvar -ne '{"a":1,"b":"c"}') {
+            if ($env:testvar -cne '{"a":1,"b":"c"}') {
               throw "Set-ActionVariable failed.`n$env:testvar"
             }
       - name: Set-ActionVariable test (second assert)
         uses: ./
         with:
           script: |
-            if ($env:testvar -ne '{"a":1,"b":"c"}') {
+            if ($env:testvar -cne '{"a":1,"b":"c"}') {
               throw "Set-ActionVariable failed.`n$env:testvar"
             }
 
@@ -197,9 +193,9 @@ jobs:
         with:
           script: |
             Set-ActionCommandEcho $false
-            Set-ActionVariable echovar echo-off # shouldn't show up in logs
+            Set-ActionOutput echo-off offval # shouldn't show up in logs
             Set-ActionCommandEcho $true
-            Set-ActionVariable echovar echo-on # should show up in logs
+            Set-ActionOutput echo-on onval # should show up in logs
             Set-ActionCommandEcho $false
 
       # Set-ActionFailed
@@ -215,7 +211,7 @@ jobs:
         with:
           script: |
             $result = '${{ steps.Set-ActionFailed.outcome }}'
-            if ($result -ne 'failure') {
+            if ($result -cne 'failure') {
               throw "Set-ActionFailed failed.`n$result"
             }
 
@@ -232,7 +228,6 @@ jobs:
       # Invoke-ActionNoCommandsBlock
       - name: Invoke-ActionNoCommandsBlock test (act)
         id: Invoke-ActionNoCommandsBlock
-        shell: pwsh
         run: |
             Import-Module ./lib/GitHubActionsCore -Force
             Invoke-ActionNoCommandsBlock -GenerateToken {
