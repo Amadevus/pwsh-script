@@ -14,7 +14,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Test with Pester
         run: ./test.ps1
       - name: Invoke action
@@ -43,20 +43,20 @@ jobs:
   build-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build module docs
         uses: ./
         with:
           script: |
             ./build-docs.ps1 -Clean
-            git status --porcelain || (throw "Documentation isn't up to date. Run 'build-docs.ps1' and commit changes.")
+            git status --porcelain || $(throw "Documentation isn't up to date. Run 'build-docs.ps1' and commit changes.")
   self-testing:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # return string result
       - name: Test that returned result string is not json serialized (act)
