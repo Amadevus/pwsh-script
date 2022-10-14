@@ -50,14 +50,55 @@ Describe 'Get-ActionInput' {
 }
 Describe 'Set-ActionOutput' {
     BeforeAll {
-        Mock Write-Host { } -ModuleName GitHubActionsCore
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Used in AfterAll')]
+        $oldGithubOut = $env:GITHUB_OUTPUT
     }
-    It "Sends appropriate workflow command to host" {
-        Set-ActionOutput 'my-result' 'test value'
-
-        Should -Invoke Write-Host -ParameterFilter {
-            $Object -eq '::set-output name=my-result::test value'
-        } -ModuleName GitHubActionsCore
+    BeforeEach {
+        $env:GITHUB_OUTPUT = $null
+    }
+    AfterAll {
+        $env:GITHUB_OUTPUT = $oldGithubOut
+    }
+    Context "Given value '<value>'" -Foreach @(
+        @{ Value = ''; ExpectedCmd = ''; ExpectedEnv = $null }
+        @{ Value = 'test value'; ExpectedCmd = 'test value'; ExpectedEnv = 'test value' }
+        @{ Value = "test `n multiline `r`n value"; ExpectedCmd = 'test %0A multiline %0D%0A value'; ExpectedEnv = "test `n multiline `r`n value" }
+        @{ Value = 'A % B'; ExpectedCmd = 'A %25 B'; ExpectedEnv = 'A % B' }
+        @{ Value = [ordered]@{ a = '1x'; b = '2y' }; ExpectedCmd = '{"a":"1x","b":"2y"}'; ExpectedEnv = '{"a":"1x","b":"2y"}' }
+    ) {
+        Context "When GITHUB_OUTPUT not set" {
+            BeforeAll {
+                Mock Write-Host { } -ModuleName GitHubActionsCore
+            }
+            It "Sends command with '<expectedcmd>'" {
+                Set-ActionOutput 'my-result' $Value
+        
+                Should -Invoke Write-Host -ParameterFilter {
+                    $Object -eq "::set-output name=my-result::$ExpectedCmd"
+                } -ModuleName GitHubActionsCore
+            }
+        }
+        Context "When GITHUB_OUTPUT is set" {
+            BeforeEach {
+                $testPath = 'TestDrive:/out-cmd.env'
+                Set-Content $testPath '' -NoNewline
+                $env:GITHUB_OUTPUT = $testPath
+            }
+            It "Appends command file with formatted command '<expectedenv>'" {
+                Set-ActionOutput 'my-result' $Value
+        
+                $eol = [System.Environment]::NewLine
+                if ($ExpectedEnv -contains "`n") {
+                    $null, $delimiter = (Get-Content $testPath)[0] -split "<<"
+                    Get-Content $testPath -Raw
+                    | Should -BeExactly "my-result<<$delimiter${eol}$ExpectedEnv${eol}$delimiter${eol}"
+                }
+                else {
+                    Get-Content $testPath -Raw
+                    | Should -BeExactly "my-result=$ExpectedEnv${eol}"
+                }
+            }
+        }
     }
 }
 Describe 'Add-ActionSecret' {
@@ -90,6 +131,7 @@ Describe 'Set-ActionVariable' {
     Context "Given value '<value>'" -Foreach @(
         @{ Value = ''; ExpectedCmd = ''; ExpectedEnv = $null }
         @{ Value = 'test value'; ExpectedCmd = 'test value'; ExpectedEnv = 'test value' }
+        @{ Value = "test `n multiline `r`n value"; ExpectedCmd = 'test %0A multiline %0D%0A value'; ExpectedEnv = "test `n multiline `r`n value" }
         @{ Value = 'A % B'; ExpectedCmd = 'A %25 B'; ExpectedEnv = 'A % B' }
         @{ Value = [ordered]@{ a = '1x'; b = '2y' }; ExpectedCmd = '{"a":"1x","b":"2y"}'; ExpectedEnv = '{"a":"1x","b":"2y"}' }
     ) {
@@ -125,16 +167,30 @@ Describe 'Set-ActionVariable' {
         
                 $env:TESTVAR | Should -Be $ExpectedEnv
                 $eol = [System.Environment]::NewLine
-                Get-Content $testPath -Raw
-                | Should -BeExactly "TESTVAR<<_GitHubActionsFileCommandDelimeter_${eol}$ExpectedEnv${eol}_GitHubActionsFileCommandDelimeter_${eol}"
+                if ($ExpectedEnv -contains "`n") {
+                    $null, $delimiter = (Get-Content $testPath)[0] -split "<<"
+                    Get-Content $testPath -Raw
+                    | Should -BeExactly "TESTVAR<<$delimiter${eol}$ExpectedEnv${eol}$delimiter${eol}"
+                }
+                else {
+                    Get-Content $testPath -Raw
+                    | Should -BeExactly "TESTVAR=$ExpectedEnv${eol}"
+                }
             }
             It "Appends command file with formatted command and doesn't set env var due to -SkipLocal" {
                 Set-ActionVariable TESTVAR $Value -SkipLocal
         
                 $env:TESTVAR | Should -BeNullOrEmpty
                 $eol = [System.Environment]::NewLine
-                Get-Content $testPath -Raw
-                | Should -BeExactly "TESTVAR<<_GitHubActionsFileCommandDelimeter_${eol}$ExpectedEnv${eol}_GitHubActionsFileCommandDelimeter_${eol}"
+                if ($ExpectedEnv -contains "`n") {
+                    $null, $delimiter = (Get-Content $testPath)[0] -split "<<"
+                    Get-Content $testPath -Raw
+                    | Should -BeExactly "TESTVAR<<$delimiter${eol}$ExpectedEnv${eol}$delimiter${eol}"
+                }
+                else {
+                    Get-Content $testPath -Raw
+                    | Should -BeExactly "TESTVAR=$ExpectedEnv${eol}"
+                }
             }
         }
     }

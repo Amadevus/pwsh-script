@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 * rename default branch to `main`
+* use [Environment Files] for `Set-ActionOutput` command
 
 ## [2.0.1] - 2021-02-05
 

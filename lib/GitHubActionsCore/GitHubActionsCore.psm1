@@ -44,9 +44,7 @@ function Set-ActionVariable {
 
     ## To take effect for all subsequent actions/steps
     if ($env:GITHUB_ENV) {
-        $delimiter = '_GitHubActionsFileCommandDelimeter_'
-        $eol = [System.Environment]::NewLine
-        $commandValue = "$name<<${delimiter}${eol}${convertedValue}${eol}${delimiter}"
+        $commandValue = ConvertTo-ActionKeyValueFileCommand $Name $Value
         Send-ActionFileCommand -Command ENV -Message $commandValue
     }
     else {
@@ -182,9 +180,15 @@ function Set-ActionOutput {
         [object]$Value
     )
 
-    Send-ActionCommand set-output @{
-        name = $Name
-    } -Message (ConvertTo-ActionCommandValue $Value)
+    if ($env:GITHUB_OUTPUT) {
+        $commandValue = ConvertTo-ActionKeyValueFileCommand $Name $Value
+        Send-ActionFileCommand -Command OUTPUT -Message $commandValue
+    }
+    else {
+        Send-ActionCommand set-output @{
+            name = $Name
+        } -Message (ConvertTo-ActionCommandValue $Value)
+    }
 }
 
 <#
@@ -649,6 +653,43 @@ function ConvertTo-ActionCommandString {
     $cmdStr += ConvertTo-ActionEscapedData $Message
 
     return $cmdStr
+}
+
+<#
+.SYNOPSIS
+Formats a key-value pair into a string so it can be saved into an environment file.
+.DESCRIPTION
+Formats a key-value pair. If the command-converted value contains newlines, the format used
+is {name}<<{delimiter}EOL{converted-value}EOL{delimiter}. Otherwise, {name}={value} is used.
+.LINK
+https://github.com/actions/toolkit/blob/ffb7e3e14ed5e28ae00e9c49ba02b2764d57a6b7/packages/core/src/file-command.ts#L27-L47
+#>
+function ConvertTo-ActionKeyValueFileCommand {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Name,
+
+        [Parameter(Mandatory, Position = 1)]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [AllowEmptyCollection()]
+        [object]$Value
+    )
+    $convertedValue = ConvertTo-ActionCommandValue $Value
+    if (-not ($convertedValue -contains "`n")) {
+        return "$Name=$convertedValue"
+    }
+    $delimiter = "ghadelimiter_$(New-Guid)"
+    if ($Name -contains $delimiter) {
+        throw "Unexpected input: name should not contain the delimiter `"$delimiter`""
+    }
+    if ($convertedValue -contains $delimiter) {
+        throw "Unexpected input: value should not contain the delimiter `"$delimiter`""
+    }
+    $eol = [System.Environment]::NewLine
+    return "$Name<<$delimiter$eol$convertedValue$eol$delimiter"
 }
 
 <#
