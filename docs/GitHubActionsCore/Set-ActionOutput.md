@@ -47,8 +47,8 @@ OUTPUTS
     
     
 RELATED LINKS
-    https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
-    https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
+    https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
+    https://github.com/actions/toolkit/tree/main/packages/core#inputsoutputs
 
 ```
 

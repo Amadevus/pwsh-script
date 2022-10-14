@@ -17,9 +17,9 @@ The value of the variable. Non-string values will be converted to a string via C
 .PARAMETER SkipLocal
 Do not set variable in current action's/step's environment.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exporting-variables
+https://github.com/actions/toolkit/tree/main/packages/core#exporting-variables
 #>
 function Set-ActionVariable {
     [CmdletBinding()]
@@ -63,9 +63,9 @@ Equivalent of `core.setSecret(secret)`.
 .PARAMETER Secret
 The value of the secret.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#masking-a-value-in-log
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#setting-a-secret
+https://github.com/actions/toolkit/tree/main/packages/core#setting-a-secret
 #>
 function Add-ActionSecret {
     [CmdletBinding()]
@@ -87,9 +87,9 @@ The new path to add.
 .PARAMETER SkipLocal
 Do not prepend path to current action's/step's environment PATH.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#adding-a-system-path
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-system-path
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#path-manipulation
+https://github.com/actions/toolkit/tree/main/packages/core#path-manipulation
 #>
 function Add-ActionPath {
     [CmdletBinding()]
@@ -131,9 +131,9 @@ Name of the input to get
 .PARAMETER Required
 Whether the input is required. If required and not present, will throw.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#using-workflow-commands-to-access-toolkit-functions
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
+https://github.com/actions/toolkit/tree/main/packages/core#inputsoutputs
 #>
 function Get-ActionInput {
     [CmdletBinding()]
@@ -164,9 +164,9 @@ Name of the output to set.
 .PARAMETER Value
 Value to store. Non-string values will be converted to a string via ConvertTo-Json.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
+https://github.com/actions/toolkit/tree/main/packages/core#inputsoutputs
 #>
 function Set-ActionOutput {
     [CmdletBinding()]
@@ -195,7 +195,7 @@ Equivalent of `core.setCommandEcho(enabled)`.
 .PARAMETER Enabled
 $true to enable echoing, $false to disable.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#echoing-command-outputs
 #>#
 function Set-ActionCommandEcho {
     [CmdletBinding()]
@@ -215,9 +215,9 @@ Equivalent of `core.setFailed(message)`.
 .PARAMETER Message
 Add issue message.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#using-workflow-commands-to-access-toolkit-functions
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#exit-codes
+https://github.com/actions/toolkit/tree/main/packages/core#exit-codes
 #>
 function Set-ActionFailed {
     [CmdletBinding()]
@@ -234,9 +234,9 @@ function Set-ActionFailed {
 Gets whether Actions Step Debug is on or not.
 Equivalent of `core.isDebug()`.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#using-workflow-commands-to-access-toolkit-functions
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#logging
+https://github.com/actions/toolkit/tree/main/packages/core#logging
 #>
 function Get-ActionIsDebug {
     [CmdletBinding()]
@@ -252,9 +252,9 @@ Equivalent of `core.debug(message)`.
 .PARAMETER Message
 Debug message.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-debug-message
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-a-debug-message
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#logging
+https://github.com/actions/toolkit/tree/main/packages/core#logging
  #>
 function Write-ActionDebug {
     [CmdletBinding()]
@@ -282,9 +282,9 @@ Column number in Line in File where the issue occured.
 File, Line and Column parameters are supported by the actual workflow command,
 but not available in `@actions/core` package.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#logging
+https://github.com/actions/toolkit/tree/main/packages/core#logging
  #>
 function Write-ActionError {
     [CmdletBinding()]
@@ -336,9 +336,9 @@ Column number in Line in File where the issue occured.
 File, Line and Column parameters are supported by the actual workflow command,
 but not available in `@actions/core` package.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-a-warning-message
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#logging
+https://github.com/actions/toolkit/tree/main/packages/core#logging
  #>
 function Write-ActionWarning {
     [CmdletBinding()]
@@ -382,9 +382,9 @@ Forwards to Write-Host.
 .PARAMETER Message
 Info message.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#using-workflow-commands-to-access-toolkit-functions
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#logging
+https://github.com/actions/toolkit/tree/main/packages/core#logging
  #>
 function Write-ActionInfo {
     [CmdletBinding()]
@@ -406,9 +406,9 @@ Output until the next `groupEnd` will be foldable in this group.
 .PARAMETER Name
 The name of the output group.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#grouping-log-lines
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#logging
+https://github.com/actions/toolkit/tree/main/packages/core#logging
  #>
 function Enter-ActionOutputGroup {
     [CmdletBinding()]
@@ -426,9 +426,9 @@ function Enter-ActionOutputGroup {
 End an output group.
 Equivalent of `core.endGroup()`.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#grouping-log-lines
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#logging
+https://github.com/actions/toolkit/tree/main/packages/core#logging
  #>
 function Exit-ActionOutputGroup {
     [CmdletBinding()]
@@ -445,9 +445,9 @@ Name of the output group.
 .PARAMETER ScriptBlock
 Script block to execute in between opening and closing output group.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#grouping-log-lines
 .LINK
-https://github.com/actions/toolkit/tree/master/packages/core#logging
+https://github.com/actions/toolkit/tree/main/packages/core#logging
 #>
 function Invoke-ActionGroup {
     [CmdletBinding()]
@@ -480,7 +480,7 @@ Script block to invoke within a no-commands context.
 .PARAMETER GenerateToken
 Use this to automatically generate a GUID and use it as the EndToken.
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#stopping-and-starting-workflow-commands
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#stopping-and-starting-workflow-commands
 #>
 function Invoke-ActionNoCommandsBlock {
     [CmdletBinding()]
@@ -531,7 +531,7 @@ PS> Send-ActionCommand warning 'This is the user warning message'
 PS> Send-ActionCommand set-secret @{name='mypassword'} 'definitelyNotAPassword!'
 ::set-secret name=mypassword::definitelyNotAPassword!
 .LINK
-https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#about-workflow-commands
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#about-workflow-commands
 #>
 function Send-ActionCommand {
     [CmdletBinding()]
@@ -567,7 +567,7 @@ PS> Send-ActionFileCommand ENV 'myvar=value'
 .EXAMPLE
 PS> 'myvar=value', 'myvar2=novalue' | Send-ActionFileCommand ENV
 .LINK
-https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#environment-files
+https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
 #>
 function Send-ActionFileCommand {
     [CmdletBinding()]

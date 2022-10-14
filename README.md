@@ -3,7 +3,7 @@
 GitHub Action to run PowerShell scripts that use the workflow run context - inspired by [actions/github-script].
 
 ![GitHub top language](https://img.shields.io/github/languages/top/Amadevus/pwsh-script?logo=powershell)
-[![CI](https://github.com/Amadevus/pwsh-script/workflows/CI/badge.svg?branch=master)](https://github.com/Amadevus/pwsh-script/actions?query=workflow%3ACI)
+[![CI](https://github.com/Amadevus/pwsh-script/workflows/CI/badge.svg?branch=main)](https://github.com/Amadevus/pwsh-script/actions?query=workflow%3ACI)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Amadevus/pwsh-script)](https://github.com/Amadevus/pwsh-script/releases/latest)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/Amadevus/pwsh-script/latest)
 
@@ -17,7 +17,7 @@ The following variables are initialized before your script is executed:
 - `$matrix` is an object representing the workflow's [`matrix` context]
 
 [actions/github-script]: https://github.com/actions/github-script
-[`@actions/core`]: https://github.com/actions/toolkit/tree/master/packages/core
+[`@actions/core`]: https://github.com/actions/toolkit/tree/main/packages/core
 [`github` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#github-context
 [`job` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#job-context
 [`runner` context]: https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#runner-context

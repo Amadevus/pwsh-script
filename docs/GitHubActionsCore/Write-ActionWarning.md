@@ -77,8 +77,8 @@ NOTES
     
     
 RELATED LINKS
-    https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message
-    https://github.com/actions/toolkit/tree/master/packages/core#logging
+    https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-a-warning-message
+    https://github.com/actions/toolkit/tree/main/packages/core#logging
 
 ```
 

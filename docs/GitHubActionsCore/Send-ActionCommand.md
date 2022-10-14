@@ -80,7 +80,7 @@ OUTPUTS
     
     
 RELATED LINKS
-    https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#about-workflow-commands
+    https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#about-workflow-commands
 
 ```
 

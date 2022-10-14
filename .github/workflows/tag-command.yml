@@ -1,5 +1,5 @@
 name: Tag command
-# trigger by chatops '/tag v1.0.0 ref=master force'
+# trigger by chatops '/tag v1.0.0 ref=main force'
 # first non-named arg is interpreted as the tag name to be created
 # ref defaults to default repo branch and is the ref going to be tagged
 # 'force', if specified in args, adds `--force` to tagging operations (to move major tags like v1/v2)

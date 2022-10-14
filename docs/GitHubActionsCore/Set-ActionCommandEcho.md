@@ -39,7 +39,7 @@ OUTPUTS
     
     
 RELATED LINKS
-    https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#masking-a-value-in-log
+    https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#echoing-command-outputs
 
 ```
 

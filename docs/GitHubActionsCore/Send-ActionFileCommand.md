@@ -66,7 +66,7 @@ OUTPUTS
     
     
 RELATED LINKS
-    https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#environment-files
+    https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
 
 ```
 
