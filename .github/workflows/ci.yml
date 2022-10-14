@@ -24,13 +24,21 @@ jobs:
           $env:PWSH_SCRIPT_ACTION_TEXT = 'Write-Host "ok"; return "value"'
           $output = pwsh -file ./action.ps1
           if ($LASTEXITCODE -ne 0) {
-            $output | Write-Error
-            throw 'pwsh failed'
+            Write-Host "::error::Action exited with exit code $LASTEXITCODE and outputted: $output"
+            throw
           }
-          $diff = Compare-Object @('ok','::set-output name=result::value') $output -CaseSensitive
+          $diff = Compare-Object @('ok') $output -CaseSensitive
           if ($diff) {
             $diff | Format-Table | Write-Host
-            throw 'Output differed from the expected'
+            Write-Host "::error::Action output differed from the expected, see above."
+            throw "Action output differed from the expected"
+          }
+          $outFile = Get-Content $env:GITHUB_OUTPUT
+          $diff = Compare-Object @('result=value') $outFile
+          if ($diff) {
+            $diff | Format-Table | Write-Host
+            Write-Host "::error::Action output file differed from the expected, see above."
+            throw "Action output file differed from the expected"
           }
   build-docs:
     runs-on: ubuntu-latest
@@ -226,20 +234,12 @@ jobs:
             }
 
       # Invoke-ActionNoCommandsBlock
-      - name: Invoke-ActionNoCommandsBlock test (act)
+      - name: Invoke-ActionNoCommandsBlock test (manual check)
         id: Invoke-ActionNoCommandsBlock
         run: |
             Import-Module ./lib/GitHubActionsCore -Force
             Invoke-ActionNoCommandsBlock -GenerateToken {
-              Set-ActionOutput testout testval
-            }
-      - name: Invoke-ActionNoCommandsBlock test (assert)
-        uses: ./
-        with:
-          script: |
-            $result = '${{ steps.Invoke-ActionNoCommandsBlock.outputs.testout }}'
-            if ($result) {
-              throw "Invoke-ActionNoCommandsBlock failed.`n$result"
+              Write-ActionError "this should not be visible"
             }
 
       # Write-Action -Debug, -Info, -Warning, -Error and Grouping are not testable in any sensible manner
