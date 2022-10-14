@@ -8,10 +8,9 @@ jobs:
     if: startsWith(github.event.comment.body, '/')
     steps:
       - name: /command dispatch
-        uses: peter-evans/slash-command-dispatch@v2
+        uses: peter-evans/slash-command-dispatch@v3
         with:
           token: ${{ secrets.SLASH_COMMAND_DISPATCH_TOKEN }}
-          reaction-token: ${{ github.token }}
           config: >
             [
               {
