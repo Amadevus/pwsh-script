@@ -68,7 +68,7 @@ jobs:
         run: |
           $result = '${{ steps.test-result-string.outputs.result }}'
           if ($result -cne 'testmsg') {
-            Write-Host "::error::Return string test failed: invalid result.`n$result"
+            Write-Host "::error::unexpected - Return string test failed: invalid result.`n$result"
             exit 1
           }
 
@@ -82,7 +82,7 @@ jobs:
         run: |
           $result = '${{ steps.test-result-object.outputs.result }}'
           if ($result -cne '{"a":1,"b":"c"}') {
-            Write-Host "::error::Return object test failed: invalid result.`n$result"
+            Write-Host "::error::unexpected - Return object test failed: invalid result.`n$result"
             exit 1
           }
 
@@ -92,17 +92,17 @@ jobs:
         id: test-throwing-fails-action
         continue-on-error: true
         with:
-          script: 'throw "test error message"'
+          script: 'throw "expected: test error message"'
       - name: Test that throwing causes action to fail (assert)
         run: |
           $outcome = '${{ steps.test-throwing-fails-action.outcome }}'
           if ($outcome -cne 'failure') {
-            Write-Host "::error::Throwing test failed: invalid outcome.`n$outcome"
+            Write-Host "::error::unexpected - Throwing test failed: invalid outcome.`n$outcome"
             exit 1
           }
           $errMsg = '${{ steps.test-throwing-fails-action.outputs.error }}'
-          if ($errMsg -cne 'test error message') {
-            Write-Host "::error::Throwing test failed: invalid error output.`n$errMsg"
+          if ($errMsg -cne 'expected: test error message') {
+            Write-Host "::error::unexpected - Throwing test failed: invalid error output.`n$errMsg"
             exit 1
           }
 
@@ -114,7 +114,7 @@ jobs:
             function Test-Value ($expression, $expected) {
               $actual = Invoke-Expression $expression
               if ($actual -cne $expected) {
-                throw "Failed assertion:'$expression' evaluated to '$actual', expected '$expected'."
+                throw "unexpected: Failed assertion:'$expression' evaluated to '$actual', expected '$expected'."
               }
             }
             Test-Value '$github.token' '${{ github.token }}'
@@ -133,11 +133,11 @@ jobs:
           script: |
             $script = Get-ActionInput script
             if ($script -notlike '$script = Get-ActionInput script*') {
-              throw "Get-ActionInput for 'script' failed.`n$script"
+              throw "unexpected: Get-ActionInput for 'script' failed.`n$script"
             }
             $custom = Get-ActionInput custom-input
             if ($custom -cne 'test') {
-              throw "Get-ActionInput for 'custom-input' failed.`n$custom"
+              throw "unexpected: Get-ActionInput for 'custom-input' failed.`n$custom"
             }
 
       # Set-ActionOutput
@@ -152,7 +152,7 @@ jobs:
           script: |
             $output = '${{ steps.Set-ActionOutput.outputs.testout }}'
             if ($output -cne 'testval') {
-              throw "Set-ActionOutput failed.`n$output"
+              throw "unexpected: Set-ActionOutput failed.`n$output"
             }
 
       # Add-ActionPath
@@ -165,7 +165,7 @@ jobs:
         with:
           script: |
             if ($env:PATH -notlike "*testing add-path$([System.IO.Path]::PathSeparator)*") {
-              throw "Add-ActionPath failed.`n$env:PATH"
+              throw "unexpected: Add-ActionPath failed.`n$env:PATH"
             }
 
       # Add-ActionSecret
@@ -185,14 +185,14 @@ jobs:
             $props = [ordered]@{ a = 1; b = 'c' }
             Set-ActionVariable testvar $props
             if ($env:testvar -cne '{"a":1,"b":"c"}') {
-              throw "Set-ActionVariable failed.`n$env:testvar"
+              throw "unexpected: Set-ActionVariable failed.`n$env:testvar"
             }
       - name: Set-ActionVariable test (second assert)
         uses: ./
         with:
           script: |
             if ($env:testvar -cne '{"a":1,"b":"c"}') {
-              throw "Set-ActionVariable failed.`n$env:testvar"
+              throw "unexpected: Set-ActionVariable failed.`n$env:testvar"
             }
 
       # Set-ActionCommandEcho
@@ -201,9 +201,9 @@ jobs:
         with:
           script: |
             Set-ActionCommandEcho $false
-            Set-ActionOutput echo-off offval # shouldn't show up in logs
+            Set-ActionOutput echo-off "unexpected to show up" # shouldn't show up in logs
             Set-ActionCommandEcho $true
-            Set-ActionOutput echo-on onval # should show up in logs
+            Set-ActionOutput echo-on "expected to show up" # should show up in logs
             Set-ActionCommandEcho $false
 
       # Set-ActionFailed
@@ -213,14 +213,14 @@ jobs:
         continue-on-error: true
         with:
           script: |
-            Set-ActionFailed "test error"
+            Set-ActionFailed "expected: test error (this action should have exit code 1 in logs)"
       - name: Set-ActionFailed test (assert)
         uses: ./
         with:
           script: |
             $result = '${{ steps.Set-ActionFailed.outcome }}'
             if ($result -cne 'failure') {
-              throw "Set-ActionFailed failed.`n$result"
+              throw "unexpected: Set-ActionFailed failed.`n$result"
             }
 
       # Get-ActionIsDebug
@@ -230,7 +230,7 @@ jobs:
           script: |
             $result = Get-ActionIsDebug
             if ($result -ne ($env:RUNNER_DEBUG -eq '1')) {
-              throw "Get-ActionIsDebug failed.`n$result"
+              throw "unexpected: Get-ActionIsDebug failed.`n$result"
             }
 
       # Invoke-ActionNoCommandsBlock
@@ -239,7 +239,7 @@ jobs:
         run: |
             Import-Module ./lib/GitHubActionsCore -Force
             Invoke-ActionNoCommandsBlock -GenerateToken {
-              Write-ActionError "this should not be visible"
+              Write-ActionError "unexpected: this should not be visible as error"
             }
 
       # Write-Action -Debug, -Info, -Warning, -Error and Grouping are not testable in any sensible manner
@@ -250,10 +250,10 @@ jobs:
           script: |
             Enter-ActionOutputGroup 'testing log levels'
             Write-ActionDebug "dbg msg"
-            Write-ActionInfo "info msg"
-            Write-ActionWarning "wrn msg"
-            Write-ActionError "err msg"
+            Write-ActionInfo "expected: info msg"
+            Write-ActionWarning "expected: wrn msg"
+            Write-ActionError "expected: err msg"
             Exit-ActionOutputGroup
             Invoke-ActionGroup "Invoke-ActionGroup group" {
-              Write-Host "output within Invoke-ActionGroup"
+              Write-Host "expected: output within Invoke-ActionGroup"
             }
