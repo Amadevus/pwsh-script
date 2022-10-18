@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+* fix: correctly handle multiline values in Set-ActionOutput and Set-ActionVariable.
+
 ## [2.0.2] - 2022-10-17
 
 ### Changed

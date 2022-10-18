@@ -193,6 +193,8 @@ jobs:
           script: |
             $props = [ordered]@{ a = 1; b = 'c' }
             Set-ActionVariable testvar $props
+            Set-ActionVariable testvar_multiline "line1`nline2`nline3"
+            Get-Content $env:GITHUB_ENV -Raw | Write-Host
             if ($env:testvar -cne '{"a":1,"b":"c"}') {
               throw "unexpected: Set-ActionVariable failed.`n$env:testvar"
             }
@@ -202,6 +204,9 @@ jobs:
           script: |
             if ($env:testvar -cne '{"a":1,"b":"c"}') {
               throw "unexpected: Set-ActionVariable failed.`n$env:testvar"
+            }
+            if ($env:testvar_multiline -cne "line1`nline2`nline3") {
+              throw "unexpected: Set-ActionVariable failed.`n$env:testvar_multiline"
             }
 
       # Set-ActionCommandEcho

@@ -62,7 +62,7 @@ Describe 'Set-ActionOutput' {
     Context "Given value '<value>'" -Foreach @(
         @{ Value = ''; ExpectedCmd = ''; ExpectedEnv = $null }
         @{ Value = 'test value'; ExpectedCmd = 'test value'; ExpectedEnv = 'test value' }
-        @{ Value = "test `n multiline `r`n value"; ExpectedCmd = 'test %0A multiline %0D%0A value'; ExpectedEnv = "test `n multiline `r`n value" }
+        @{ Value = "test `n multiline `r`n value"; ExpectedCmd = 'test %0A multiline %0D%0A value'; ExpectedEnv = "test `n multiline `r`n value"; Multiline = $true }
         @{ Value = 'A % B'; ExpectedCmd = 'A %25 B'; ExpectedEnv = 'A % B' }
         @{ Value = [ordered]@{ a = '1x'; b = '2y' }; ExpectedCmd = '{"a":"1x","b":"2y"}'; ExpectedEnv = '{"a":"1x","b":"2y"}' }
     ) {
@@ -88,7 +88,7 @@ Describe 'Set-ActionOutput' {
                 Set-ActionOutput 'my-result' $Value
         
                 $eol = [System.Environment]::NewLine
-                if ($ExpectedEnv -contains "`n") {
+                if ($Multiline) {
                     $null, $delimiter = (Get-Content $testPath)[0] -split "<<"
                     Get-Content $testPath -Raw
                     | Should -BeExactly "my-result<<$delimiter${eol}$ExpectedEnv${eol}$delimiter${eol}"
@@ -131,7 +131,7 @@ Describe 'Set-ActionVariable' {
     Context "Given value '<value>'" -Foreach @(
         @{ Value = ''; ExpectedCmd = ''; ExpectedEnv = $null }
         @{ Value = 'test value'; ExpectedCmd = 'test value'; ExpectedEnv = 'test value' }
-        @{ Value = "test `n multiline `r`n value"; ExpectedCmd = 'test %0A multiline %0D%0A value'; ExpectedEnv = "test `n multiline `r`n value" }
+        @{ Value = "test `n multiline `r`n value"; ExpectedCmd = 'test %0A multiline %0D%0A value'; ExpectedEnv = "test `n multiline `r`n value"; Multiline = $true }
         @{ Value = 'A % B'; ExpectedCmd = 'A %25 B'; ExpectedEnv = 'A % B' }
         @{ Value = [ordered]@{ a = '1x'; b = '2y' }; ExpectedCmd = '{"a":"1x","b":"2y"}'; ExpectedEnv = '{"a":"1x","b":"2y"}' }
     ) {
@@ -167,7 +167,7 @@ Describe 'Set-ActionVariable' {
         
                 $env:TESTVAR | Should -Be $ExpectedEnv
                 $eol = [System.Environment]::NewLine
-                if ($ExpectedEnv -contains "`n") {
+                if ($Multiline) {
                     $null, $delimiter = (Get-Content $testPath)[0] -split "<<"
                     Get-Content $testPath -Raw
                     | Should -BeExactly "TESTVAR<<$delimiter${eol}$ExpectedEnv${eol}$delimiter${eol}"
@@ -182,7 +182,7 @@ Describe 'Set-ActionVariable' {
         
                 $env:TESTVAR | Should -BeNullOrEmpty
                 $eol = [System.Environment]::NewLine
-                if ($ExpectedEnv -contains "`n") {
+                if ($Multiline) {
                     $null, $delimiter = (Get-Content $testPath)[0] -split "<<"
                     Get-Content $testPath -Raw
                     | Should -BeExactly "TESTVAR<<$delimiter${eol}$ExpectedEnv${eol}$delimiter${eol}"
