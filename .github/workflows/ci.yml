@@ -147,6 +147,7 @@ jobs:
             Import-Module ./lib/GitHubActionsCore -Force
             Set-ActionOutput testout testval
             Set-ActionOutput testout-multiline "testval`n new line `n 3rd line"
+            Get-Content $env:GITHUB_OUTPUT -Raw | Write-Host
       - name: Set-ActionOutput test (assert)
         uses: ./
         env:
