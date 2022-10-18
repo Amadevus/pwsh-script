@@ -146,12 +146,20 @@ jobs:
         run: |
             Import-Module ./lib/GitHubActionsCore -Force
             Set-ActionOutput testout testval
+            Set-ActionOutput testout-multiline "testval`n new line `n 3rd line"
       - name: Set-ActionOutput test (assert)
         uses: ./
+        env:
+          testout_output: ${{ steps.Set-ActionOutput.outputs.testout }}
+          testout_multiline_output: ${{ steps.Set-ActionOutput.outputs.testout-multiline }}
         with:
           script: |
-            $output = '${{ steps.Set-ActionOutput.outputs.testout }}'
+            $output = $env:testout_output
             if ($output -cne 'testval') {
+              throw "unexpected: Set-ActionOutput failed.`n$output"
+            }
+            $output = $env:testout_multiline_output
+            if ($output -cne "testval`n new line `n 3rd line") {
               throw "unexpected: Set-ActionOutput failed.`n$output"
             }
 
