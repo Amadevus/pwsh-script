@@ -678,7 +678,7 @@ function ConvertTo-ActionKeyValueFileCommand {
         [object]$Value
     )
     $convertedValue = ConvertTo-ActionCommandValue $Value
-    if (-not ($convertedValue -contains "`n")) {
+    if ($convertedValue -notmatch '\n') {
         return "$Name=$convertedValue"
     }
     $delimiter = "ghadelimiter_$(New-Guid)"
