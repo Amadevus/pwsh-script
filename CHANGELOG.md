@@ -7,22 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.3] - 2022-10-18
+
 ### Changed
 
-* fix: correctly handle multiline values in Set-ActionOutput and Set-ActionVariable.
+- fix: correctly handle multiline values in `Set-ActionOutput` and `Set-ActionVariable`. ([#18])
+
+[#18]: https://github.com/Amadevus/pwsh-script/pull/18
 
 ## [2.0.2] - 2022-10-17
 
 ### Changed
-* rename default branch to `main`
-* use [Environment Files] for `Set-ActionOutput` command
+
+- rename default branch to `main`.
+- use [Environment Files] for `Set-ActionOutput` command. ([#14])
+
+[#14]: https://github.com/Amadevus/pwsh-script/pull/14
 
 ## [2.0.1] - 2021-02-05
 
 ### Added
+
 - `Send-ActionFileCommand` cmdlet that handles sending commands to [Environment Files] instead of console output ([#8]).
 
 ### Changed
+
 - `Add-ActionPath` and `Set-ActionVariable` are updated for [Environment Files] Actions Runner change ([#8]).
 
 [Environment Files]: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#environment-files
@@ -31,11 +40,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2020-09-10
 
 ### Changed
+
 - Refactored into a 'composite' action which has following implications ([#4]):
   - Action runs slightly faster because there's no 'node' process in between (or io stream redirects).
   - Action has now just single `script` input, and you cannot "add" outputs other than automatic "result" and "error".
 
 ### Removed
+
 - All optional inputs - until "composite" refactor, they were used to pass workflow contexts to the action.
   It's no longer necessary, since 'composite' action can "grab" them on it's own.
 - Ability to set custom `outputs` from the script - now only `result` and `error` are set (as outlined in readme).
@@ -45,10 +56,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2020-06-10
 
 ### Added
+
 - Initial action code
 - `GitHubActionsCore` PowerShell module
 
-[Unreleased]: https://github.com/Amadevus/pwsh-script/compare/v2.0.2...HEAD
+[Unreleased]: https://github.com/Amadevus/pwsh-script/compare/v2.0.3...HEAD
+[2.0.3]: https://github.com/Amadevus/pwsh-script/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/Amadevus/pwsh-script/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/Amadevus/pwsh-script/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Amadevus/pwsh-script/compare/v1.0.0...v2.0.0
