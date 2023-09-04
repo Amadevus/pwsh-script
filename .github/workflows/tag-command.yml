@@ -17,7 +17,7 @@ jobs:
         with:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: "[Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.client_payload.slash_command.args.named.ref }}
       - name: Resolve version, tag and push
